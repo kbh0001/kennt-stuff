@@ -1182,13 +1182,13 @@
         </member>
         <member name="M:NinjaTrader.Indicator.Indicator.MyCustomIndicator(System.Int32)">
             <summary>
-            Enter the description of your new custom indicator here
+            I has a descr
             </summary>
             <returns></returns>
         </member>
         <member name="M:NinjaTrader.Indicator.Indicator.MyCustomIndicator(NinjaTrader.Data.IDataSeries,System.Int32)">
             <summary>
-            Enter the description of your new custom indicator here
+            I has a descr
             </summary>
             <returns></returns>
         </member>
@@ -2447,13 +2447,13 @@
         </member>
         <member name="M:NinjaTrader.MarketAnalyzer.Column.MyCustomIndicator(System.Int32)">
             <summary>
-            Enter the description of your new custom indicator here
+            I has a descr
             </summary>
             <returns></returns>
         </member>
         <member name="M:NinjaTrader.MarketAnalyzer.Column.MyCustomIndicator(NinjaTrader.Data.IDataSeries,System.Int32)">
             <summary>
-            Enter the description of your new custom indicator here
+            I has a descr
             </summary>
             <returns></returns>
         </member>
@@ -3722,13 +3722,13 @@
         </member>
         <member name="M:NinjaTrader.Strategy.Strategy.MyCustomIndicator(System.Int32)">
             <summary>
-            Enter the description of your new custom indicator here
+            I has a descr
             </summary>
             <returns></returns>
         </member>
         <member name="M:NinjaTrader.Strategy.Strategy.MyCustomIndicator(NinjaTrader.Data.IDataSeries,System.Int32)">
             <summary>
-            Enter the description of your new custom indicator here
+            I has a descr
             </summary>
             <returns></returns>
         </member>

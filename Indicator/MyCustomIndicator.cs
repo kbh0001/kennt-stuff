@@ -16,7 +16,7 @@ namespace NinjaTrader.Indicator
     /// <summary>
     /// Enter the description of your new custom indicator here
     /// </summary>
-    [Description("Enter the description of your new custom indicator here")]
+    [Description("I has a descr")]
     public class MyCustomIndicator : Indicator
     {
         #region Variables
@@ -76,7 +76,7 @@ namespace NinjaTrader.Indicator
         private static MyCustomIndicator checkMyCustomIndicator = new MyCustomIndicator();
 
         /// <summary>
-        /// Enter the description of your new custom indicator here
+        /// I has a descr
         /// </summary>
         /// <returns></returns>
         public MyCustomIndicator MyCustomIndicator(int myInput0)
@@ -85,7 +85,7 @@ namespace NinjaTrader.Indicator
         }
 
         /// <summary>
-        /// Enter the description of your new custom indicator here
+        /// I has a descr
         /// </summary>
         /// <returns></returns>
         public MyCustomIndicator MyCustomIndicator(Data.IDataSeries input, int myInput0)
@@ -134,7 +134,7 @@ namespace NinjaTrader.MarketAnalyzer
     public partial class Column : ColumnBase
     {
         /// <summary>
-        /// Enter the description of your new custom indicator here
+        /// I has a descr
         /// </summary>
         /// <returns></returns>
         [Gui.Design.WizardCondition("Indicator")]
@@ -144,7 +144,7 @@ namespace NinjaTrader.MarketAnalyzer
         }
 
         /// <summary>
-        /// Enter the description of your new custom indicator here
+        /// I has a descr
         /// </summary>
         /// <returns></returns>
         public Indicator.MyCustomIndicator MyCustomIndicator(Data.IDataSeries input, int myInput0)
@@ -160,7 +160,7 @@ namespace NinjaTrader.Strategy
     public partial class Strategy : StrategyBase
     {
         /// <summary>
-        /// Enter the description of your new custom indicator here
+        /// I has a descr
         /// </summary>
         /// <returns></returns>
         [Gui.Design.WizardCondition("Indicator")]
@@ -170,7 +170,7 @@ namespace NinjaTrader.Strategy
         }
 
         /// <summary>
-        /// Enter the description of your new custom indicator here
+        /// I has a descr
         /// </summary>
         /// <returns></returns>
         public Indicator.MyCustomIndicator MyCustomIndicator(Data.IDataSeries input, int myInput0)
