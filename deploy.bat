@@ -1,1 +1,1 @@
-copy bin\debug\*.dll *.*
+copy bin\release64\*.dll *.*

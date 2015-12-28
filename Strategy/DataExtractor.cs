@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using Dapper;
 
 // This namespace holds all strategies and is required. Do not change it.
+
 namespace NinjaTrader.Custom.Strategy
 {
     /// <summary>
@@ -65,6 +66,8 @@ namespace NinjaTrader.Custom.Strategy
         /// </summary>
         protected override void OnBarUpdate()
         {
+            var dood = new KenNinja.KenCrap();
+
 			var myRow = new DataItem{
 				High = High[0],
 				Low = Low[0],
