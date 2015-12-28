@@ -6934,17 +6934,17 @@
             Called on each bar update event (incoming tick)
             </summary>
         </member>
-        <member name="T:NinjaTrader.Strategy.DataExtractor">
+        <member name="T:NinjaTrader.Custom.Strategy.DataExtractor">
             <summary>
             Get Some Data
             </summary>
         </member>
-        <member name="M:NinjaTrader.Strategy.DataExtractor.Initialize">
+        <member name="M:NinjaTrader.Custom.Strategy.DataExtractor.Initialize">
             <summary>
             This method is used to configure the strategy and is called once before any strategy method is called.
             </summary>
         </member>
-        <member name="M:NinjaTrader.Strategy.DataExtractor.OnBarUpdate">
+        <member name="M:NinjaTrader.Custom.Strategy.DataExtractor.OnBarUpdate">
             <summary>
             Called on each bar update event (incoming tick)
             </summary>

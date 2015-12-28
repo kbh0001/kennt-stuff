@@ -1,28 +1,17 @@
-
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Xml.Serialization;
-using NinjaTrader.Cbi;
-using NinjaTrader.Data;
-using NinjaTrader.Indicator;
-using NinjaTrader.Gui.Chart;
-using NinjaTrader.Strategy;
-using System.Data.SqlClient;
 using System.Data;
+using System.Data.SqlClient;
 using Dapper;
-using System.Linq;
 
 // This namespace holds all strategies and is required. Do not change it.
-namespace NinjaTrader.Strategy
+namespace NinjaTrader.Custom.Strategy
 {
     /// <summary>
     /// Get Some Data
     /// </summary>
     [Description("Get Some Data")]
-    public class DataExtractor : Strategy
+    public class DataExtractor : NinjaTrader.Strategy.Strategy
     {
 		public class DataItem {
 			public string Ver {get; set;}
