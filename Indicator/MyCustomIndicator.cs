@@ -30,6 +30,8 @@ namespace NinjaTrader.Indicator
         /// </summary>
         protected override void Initialize()
         {
+
+            var i = 5;
             Add(new Plot(Color.FromKnownColor(KnownColor.Orange), PlotStyle.Line, "Plot0"));
             Overlay				= false;
         }
