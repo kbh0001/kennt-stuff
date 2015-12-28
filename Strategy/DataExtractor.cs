@@ -66,7 +66,7 @@ namespace NinjaTrader.Custom.Strategy
         /// </summary>
         protected override void OnBarUpdate()
         {
-            var dood = new KenNinja.KenCrap();
+          
 
 			var myRow = new DataItem{
 				High = High[0],

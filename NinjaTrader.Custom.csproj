@@ -401,8 +401,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Strategy\DataExtractor.cs" />
-    <Compile Include="Strategy\Learn2.cs" />
-    <Compile Include="Strategy\Learn3.cs" />
     <Compile Include="Strategy\UserDefinedMethods.cs" />
     <Compile Include="Type\%40BarsTypes.cs" />
     <Compile Include="Type\%40ChartStyles.cs" />

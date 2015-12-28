@@ -6949,36 +6949,6 @@
             Called on each bar update event (incoming tick)
             </summary>
         </member>
-        <member name="T:NinjaTrader.Strategy.Learn2">
-            <summary>
-            An example crossover strategy
-            </summary>
-        </member>
-        <member name="M:NinjaTrader.Strategy.Learn2.Initialize">
-            <summary>
-            This method is used to configure the strategy and is called once before any strategy method is called.
-            </summary>
-        </member>
-        <member name="M:NinjaTrader.Strategy.Learn2.OnBarUpdate">
-            <summary>
-            Called on each bar update event (incoming tick)
-            </summary>
-        </member>
-        <member name="T:NinjaTrader.Strategy.LearnStrategy3">
-            <summary>
-            LearningHowToDoStuff
-            </summary>
-        </member>
-        <member name="M:NinjaTrader.Strategy.LearnStrategy3.Initialize">
-            <summary>
-            This method is used to configure the strategy and is called once before any strategy method is called.
-            </summary>
-        </member>
-        <member name="M:NinjaTrader.Strategy.LearnStrategy3.OnBarUpdate">
-            <summary>
-            Called on each bar update event (incoming tick)
-            </summary>
-        </member>
         <member name="T:NinjaTrader.Data.DayBarsType">
             <summary>
             </summary>
