@@ -349,7 +349,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Indicator\%40ZLEMA.cs" />
-    <Compile Include="Indicator\MyCustomIndicator.cs" />
+    <Compile Include="Indicator\KenCandleStickPattern.cs" />
     <Compile Include="Indicator\UserDefinedMethods.cs" />
     <Compile Include="MarketAnalyzer\%40AskPrice.cs" />
     <Compile Include="MarketAnalyzer\%40AverageDailyVolume.cs" />

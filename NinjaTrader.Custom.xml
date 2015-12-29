@@ -1180,15 +1180,15 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:NinjaTrader.Indicator.Indicator.MyCustomIndicator(System.Int32)">
+        <member name="M:NinjaTrader.Indicator.Indicator.KenCandleStickPattern(ChartPattern,System.Int32)">
             <summary>
-            I has a descr
+            Ken Detects common candlestick patterns and marks them on the chart.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:NinjaTrader.Indicator.Indicator.MyCustomIndicator(NinjaTrader.Data.IDataSeries,System.Int32)">
+        <member name="M:NinjaTrader.Indicator.Indicator.KenCandleStickPattern(NinjaTrader.Data.IDataSeries,ChartPattern,System.Int32)">
             <summary>
-            I has a descr
+            Ken Detects common candlestick patterns and marks them on the chart.
             </summary>
             <returns></returns>
         </member>
@@ -2445,15 +2445,15 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:NinjaTrader.MarketAnalyzer.Column.MyCustomIndicator(System.Int32)">
+        <member name="M:NinjaTrader.MarketAnalyzer.Column.KenCandleStickPattern(ChartPattern,System.Int32)">
             <summary>
-            I has a descr
+            Ken Detects common candlestick patterns and marks them on the chart.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:NinjaTrader.MarketAnalyzer.Column.MyCustomIndicator(NinjaTrader.Data.IDataSeries,System.Int32)">
+        <member name="M:NinjaTrader.MarketAnalyzer.Column.KenCandleStickPattern(NinjaTrader.Data.IDataSeries,ChartPattern,System.Int32)">
             <summary>
-            I has a descr
+            Ken Detects common candlestick patterns and marks them on the chart.
             </summary>
             <returns></returns>
         </member>
@@ -3720,15 +3720,15 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:NinjaTrader.Strategy.Strategy.MyCustomIndicator(System.Int32)">
+        <member name="M:NinjaTrader.Strategy.Strategy.KenCandleStickPattern(ChartPattern,System.Int32)">
             <summary>
-            I has a descr
+            Ken Detects common candlestick patterns and marks them on the chart.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:NinjaTrader.Strategy.Strategy.MyCustomIndicator(NinjaTrader.Data.IDataSeries,System.Int32)">
+        <member name="M:NinjaTrader.Strategy.Strategy.KenCandleStickPattern(NinjaTrader.Data.IDataSeries,ChartPattern,System.Int32)">
             <summary>
-            I has a descr
+            Ken Detects common candlestick patterns and marks them on the chart.
             </summary>
             <returns></returns>
         </member>
@@ -6114,19 +6114,24 @@
             Called on each bar update event (incoming tick)
             </summary>
         </member>
-        <member name="T:NinjaTrader.Indicator.MyCustomIndicator">
+        <member name="T:NinjaTrader.Indicator.KenCandleStickPattern">
             <summary>
-            Enter the description of your new custom indicator here
+            Detects common candlestick patterns and marks them on the chart.
             </summary>
         </member>
-        <member name="M:NinjaTrader.Indicator.MyCustomIndicator.Initialize">
+        <member name="M:NinjaTrader.Indicator.KenCandleStickPattern.Initialize">
             <summary>
             This method is used to configure the indicator and is called once before any bar data is loaded.
             </summary>
         </member>
-        <member name="M:NinjaTrader.Indicator.MyCustomIndicator.OnBarUpdate">
+        <member name="M:NinjaTrader.Indicator.KenCandleStickPattern.OnBarUpdate">
             <summary>
             Called on each bar update event (incoming tick)
+            </summary>
+        </member>
+        <member name="P:NinjaTrader.Indicator.KenCandleStickPattern.PatternFound">
+            <summary>
+            Gets a value indicating if a pattern was found
             </summary>
         </member>
         <member name="T:NinjaTrader.MarketAnalyzer.AskPrice">
