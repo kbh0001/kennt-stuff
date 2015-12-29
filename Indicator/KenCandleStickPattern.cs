@@ -27,13 +27,11 @@ namespace NinjaTrader.Indicator
     {
         private readonly Font textFont = new Font("Arial", 8, FontStyle.Regular);
         private Color downColor;
-        private bool downTrend;
      
         private int patternsFound;
         private int trendStrength = 4;
         private Color txtColor;
         private Color upColor;
-        private bool upTrend;
 
         /// <summary>
         /// Gets a value indicating if a pattern was found
@@ -73,7 +71,7 @@ namespace NinjaTrader.Indicator
         /// </summary>
         protected override void OnBarUpdate()
         {
-            var candleStickDeterminer = new KenNinja.KenCandleStickDeterminer(this, TrendStrength);
+            var candleStickDeterminer = new KenNinja.KenCandleStickDeterminer(this, TrendStrength, Print);
 
             if (CurrentBar == 0 && ChartControl != null)
             {
@@ -84,15 +82,12 @@ namespace NinjaTrader.Indicator
                 else
                     upColor = Color.Black;
             }
-
-            // Calculates trend lines and prevailing trend for patterns that require a trend
-            if (TrendStrength > 0 && CurrentBar >= TrendStrength)
-                CalculateTrendLines();
-
             Value.Set(0);
+            
+            Print("We is staring");
 
 
-            if (candleStickDeterminer.IsBearishBeltHold(upTrend))
+            if (candleStickDeterminer.IsBearishBeltHold)
             {
                 if (ChartControl != null)
                 {
@@ -109,7 +104,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsBearishEngulfing(upTrend))
+            if (candleStickDeterminer.IsBearishEngulfing)
             {
                 BarColor = downColor;
                 DrawText("Bearish Engulfing" + CurrentBar, false, "Bearish Engulfing", 0, Low[0], -10, txtColor,
@@ -119,7 +114,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsBearishHarami( upTrend))
+            if (candleStickDeterminer.IsBearishHarami)
             {
                 BarColor = downColor;
                 DrawText("Bearish Harami" + CurrentBar, false, "Bearish Harami", 0, Low[0], -10, txtColor,
@@ -129,7 +124,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsBearishHaramiCross( upTrend))
+            if (candleStickDeterminer.IsBearishHaramiCross)
             {
                 BarColor = downColor;
                 DrawText("Bearish Harami Cross" + CurrentBar, false, "Bearish Harami Cross", 0, Low[0], -10,
@@ -139,7 +134,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsBullishBeltHold( downTrend))
+            if (candleStickDeterminer.IsBullishBeltHold)
             {
                 if (ChartControl != null)
                 {
@@ -156,7 +151,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsBullishEngulfing( downTrend))
+            if (candleStickDeterminer.IsBullishEngulfing)
             {
                 if (ChartControl != null)
                 {
@@ -172,7 +167,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsBullishHarami( downTrend))
+            if (candleStickDeterminer.IsBullishHarami)
             {
                 if (ChartControl != null)
                 {
@@ -188,7 +183,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsBullishHaramiCross( downTrend))
+            if (candleStickDeterminer.IsBullishHaramiCross)
             {
                 if (ChartControl != null)
                 {
@@ -204,7 +199,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsDarkCloudCover( upTrend))
+            if (candleStickDeterminer.IsDarkCloudCover)
             {
                 if (ChartControl != null)
                 {
@@ -221,11 +216,11 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsBullTrend( downTrend))
+            if (candleStickDeterminer.IsBullTrend)
                 return;
 
 
-            if (candleStickDeterminer.IsBasicDoji())
+            if (candleStickDeterminer.IsBasicDoji)
             {
                 if (ChartControl != null)
                 {
@@ -242,7 +237,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsDownsideTasukiGap())
+            if (candleStickDeterminer.IsDownsideTasukiGap)
             {
                 if (ChartControl != null)
                 {
@@ -260,7 +255,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsEveningStar())
+            if (candleStickDeterminer.IsEveningStar)
             {
                 if (ChartControl != null)
                 {
@@ -297,7 +292,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsFallingThree())
+            if (candleStickDeterminer.IsFallingThree)
             {
                 if (ChartControl != null)
                 {
@@ -327,7 +322,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsHammer( downTrend))
+            if (candleStickDeterminer.IsHammer)
             {
                 if (ChartControl != null)
                 {
@@ -348,7 +343,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsHangingMan( upTrend))
+            if (candleStickDeterminer.IsHangingMan)
             {
                 if (ChartControl != null)
                 {
@@ -369,7 +364,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsInvertedHammer( upTrend))
+            if (candleStickDeterminer.IsInvertedHammer)
             {
                 if (ChartControl != null)
                 {
@@ -390,7 +385,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsMorningStar())
+            if (candleStickDeterminer.IsMorningStar)
             {
                 if (ChartControl != null)
                 {
@@ -427,7 +422,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsPiercingLine( downTrend))
+            if (candleStickDeterminer.IsPiercingLine)
             {
                 if (ChartControl != null)
                 {
@@ -444,7 +439,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsRisingThree())
+            if (candleStickDeterminer.IsRisingThree)
             {
                 if (ChartControl != null)
                 {
@@ -476,7 +471,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsShootingStar(upTrend))
+            if (candleStickDeterminer.IsShootingStar)
             {
                 if (ChartControl != null)
                     BarColor = downColor;
@@ -489,7 +484,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsStickSandwich())
+            if (candleStickDeterminer.IsStickSandwich)
             {
                 if (ChartControl != null)
                 {
@@ -508,7 +503,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsThreeBlackCrows( upTrend))
+            if (candleStickDeterminer.IsThreeBlackCrows)
             {
                 if (ChartControl != null)
                 {
@@ -525,7 +520,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsThreeWhiteSoldiers( downTrend))
+            if (candleStickDeterminer.IsThreeWhiteSoldiers)
             {
                 if (ChartControl != null)
                 {
@@ -545,7 +540,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsUpsideGapTwoCrows( upTrend))
+            if (candleStickDeterminer.IsUpsideGapTwoCrows)
             {
                 if (ChartControl != null)
                 {
@@ -564,7 +559,7 @@ namespace NinjaTrader.Indicator
             }
 
 
-            if (candleStickDeterminer.IsUpsideTasukiGap())
+            if (candleStickDeterminer.IsUpsideTasukiGap)
             {
                 if (ChartControl != null)
                 {
@@ -593,58 +588,6 @@ namespace NinjaTrader.Indicator
             return Name + "(" + this.GetType().Name + ")";
         }
 
-        // Calculate trend lines and prevailing trend
-        private void CalculateTrendLines()
-        {
-            // Calculate up trend line
-            var upTrendStartBarsAgo = 0;
-            var upTrendEndBarsAgo = 0;
-            var upTrendOccurence = 1;
-
-            while (Low[upTrendEndBarsAgo] <= Low[upTrendStartBarsAgo])
-            {
-                upTrendStartBarsAgo = Swing(TrendStrength).SwingLowBar(0, upTrendOccurence + 1, CurrentBar);
-                upTrendEndBarsAgo = Swing(TrendStrength).SwingLowBar(0, upTrendOccurence, CurrentBar);
-
-                if (upTrendStartBarsAgo < 0 || upTrendEndBarsAgo < 0)
-                    break;
-
-                upTrendOccurence++;
-            }
-
-
-            // Calculate down trend line	
-            var downTrendStartBarsAgo = 0;
-            var downTrendEndBarsAgo = 0;
-            var downTrendOccurence = 1;
-
-            while (High[downTrendEndBarsAgo] >= High[downTrendStartBarsAgo])
-            {
-                downTrendStartBarsAgo = Swing(TrendStrength).SwingHighBar(0, downTrendOccurence + 1, CurrentBar);
-                downTrendEndBarsAgo = Swing(TrendStrength).SwingHighBar(0, downTrendOccurence, CurrentBar);
-
-                if (downTrendStartBarsAgo < 0 || downTrendEndBarsAgo < 0)
-                    break;
-
-                downTrendOccurence++;
-            }
-
-            if (upTrendStartBarsAgo > 0 && upTrendEndBarsAgo > 0 && upTrendStartBarsAgo < downTrendStartBarsAgo)
-            {
-                upTrend = true;
-                downTrend = false;
-            }
-            else if (downTrendStartBarsAgo > 0 && downTrendEndBarsAgo > 0 && upTrendStartBarsAgo > downTrendStartBarsAgo)
-            {
-                upTrend = false;
-                downTrend = true;
-            }
-            else
-            {
-                upTrend = false;
-                downTrend = false;
-            }
-        }
     }
 }
 
