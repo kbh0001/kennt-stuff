@@ -1180,13 +1180,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:NinjaTrader.Indicator.Indicator.KenCandleStickPattern(ChartPattern,System.Int32)">
+        <member name="M:NinjaTrader.Indicator.Indicator.KenCandleStickPattern(System.Int32)">
             <summary>
             Ken Detects common candlestick patterns and marks them on the chart.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:NinjaTrader.Indicator.Indicator.KenCandleStickPattern(NinjaTrader.Data.IDataSeries,ChartPattern,System.Int32)">
+        <member name="M:NinjaTrader.Indicator.Indicator.KenCandleStickPattern(NinjaTrader.Data.IDataSeries,System.Int32)">
             <summary>
             Ken Detects common candlestick patterns and marks them on the chart.
             </summary>
@@ -2445,13 +2445,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:NinjaTrader.MarketAnalyzer.Column.KenCandleStickPattern(ChartPattern,System.Int32)">
+        <member name="M:NinjaTrader.MarketAnalyzer.Column.KenCandleStickPattern(System.Int32)">
             <summary>
             Ken Detects common candlestick patterns and marks them on the chart.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:NinjaTrader.MarketAnalyzer.Column.KenCandleStickPattern(NinjaTrader.Data.IDataSeries,ChartPattern,System.Int32)">
+        <member name="M:NinjaTrader.MarketAnalyzer.Column.KenCandleStickPattern(NinjaTrader.Data.IDataSeries,System.Int32)">
             <summary>
             Ken Detects common candlestick patterns and marks them on the chart.
             </summary>
@@ -3720,13 +3720,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:NinjaTrader.Strategy.Strategy.KenCandleStickPattern(ChartPattern,System.Int32)">
+        <member name="M:NinjaTrader.Strategy.Strategy.KenCandleStickPattern(System.Int32)">
             <summary>
             Ken Detects common candlestick patterns and marks them on the chart.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:NinjaTrader.Strategy.Strategy.KenCandleStickPattern(NinjaTrader.Data.IDataSeries,ChartPattern,System.Int32)">
+        <member name="M:NinjaTrader.Strategy.Strategy.KenCandleStickPattern(NinjaTrader.Data.IDataSeries,System.Int32)">
             <summary>
             Ken Detects common candlestick patterns and marks them on the chart.
             </summary>

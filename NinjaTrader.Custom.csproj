@@ -350,7 +350,7 @@
     </Compile>
     <Compile Include="Indicator\%40ZLEMA.cs" />
     <Compile Include="Indicator\KenCandleStickDeterminer.cs" />
-    <Compile Include="Indicator\KenCandleStickPattern.cs" />
+    <Content Include="Indicator\KenCandleStickPattern.cs" />
     <Compile Include="Indicator\UserDefinedMethods.cs" />
     <Compile Include="MarketAnalyzer\%40AskPrice.cs" />
     <Compile Include="MarketAnalyzer\%40AverageDailyVolume.cs" />
