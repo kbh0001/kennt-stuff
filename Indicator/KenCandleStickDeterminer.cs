@@ -13,275 +13,275 @@ namespace NinjaTrader.Indicator
         }
 
 
-        public static bool IsBearTrend(int trendStrength, bool isUpTrend)
+        public   bool IsBearTrend(int trendStrength, bool isUpTrend)
         {
             return trendStrength > 0 && !isUpTrend;
         }
 
-        public static bool IsBearishBeltHold(Indicator indicator, int trendstrenth, bool isUptrend)
+        public   bool IsBearishBeltHold(  int trendstrenth, bool isUptrend)
 
         {
-            if (indicator.CurrentBar < 1 || (IsBearTrend(trendstrenth, isUptrend)))
+            if (_indicator.CurrentBar < 1 || (IsBearTrend(trendstrenth, isUptrend)))
                 return false;
 
-            return indicator.Close[1] > indicator.Open[1] && indicator.Open[0] > indicator.Close[1] + 5 * indicator.TickSize && indicator.Open[0] == indicator.High[0] && indicator.Close[0] < indicator.Open[0];
+            return _indicator.Close[1] > _indicator.Open[1] && _indicator.Open[0] > _indicator.Close[1] + 5 * _indicator.TickSize && _indicator.Open[0] == _indicator.High[0] && _indicator.Close[0] < _indicator.Open[0];
         }
 
-        public static bool IsBasicDoji(Indicator indicator)
+        public   bool IsBasicDoji()
         {
-            return Math.Abs(indicator.Close[0] - indicator.Open[0]) <= (indicator.High[0] - indicator.Low[0]) * 0.07;
+            return Math.Abs(_indicator.Close[0] - _indicator.Open[0]) <= (_indicator.High[0] - _indicator.Low[0]) * 0.07;
         }
 
-        public static bool IsBearishEngulfing(Indicator indicator, int trendStrength, bool isUptrend)
+        public   bool IsBearishEngulfing(  int trendStrength, bool isUptrend)
         {
-            if (indicator.CurrentBar < 1 || (IsBearTrend(trendStrength, isUptrend)))
+            if (_indicator.CurrentBar < 1 || (IsBearTrend(trendStrength, isUptrend)))
                 return false;
 
-            return indicator.Close[1] > indicator.Open[1] && indicator.Close[0] < indicator.Open[0] && indicator.Open[0] > indicator.Close[1] && indicator.Close[0] < indicator.Open[1];
+            return _indicator.Close[1] > _indicator.Open[1] && _indicator.Close[0] < _indicator.Open[0] && _indicator.Open[0] > _indicator.Close[1] && _indicator.Close[0] < _indicator.Open[1];
         }
 
-        public static bool IsBearishHaramiCross(Indicator indicator, int trendWeight, bool isUptrend)
+        public   bool IsBearishHaramiCross(  int trendWeight, bool isUptrend)
         {
 
-            if (indicator.CurrentBar < 1 || (IsBearTrend(trendWeight, isUptrend)))
+            if (_indicator.CurrentBar < 1 || (IsBearTrend(trendWeight, isUptrend)))
                 return false;
 
-            return (indicator.High[0] <= indicator.Close[1]) && (indicator.Low[0] >= indicator.Open[1]) && indicator.Open[0] <= indicator.Close[1] && indicator.Close[0] >= indicator.Open[1] &&
-                   ((indicator.Close[0] >= indicator.Open[0] && indicator.Close[0] <= indicator.Open[0] + indicator.TickSize) ||
-                    (indicator.Close[0] <= indicator.Open[0] && indicator.Close[0] >= indicator.Open[0] - indicator.TickSize));
+            return (_indicator.High[0] <= _indicator.Close[1]) && (_indicator.Low[0] >= _indicator.Open[1]) && _indicator.Open[0] <= _indicator.Close[1] && _indicator.Close[0] >= _indicator.Open[1] &&
+                   ((_indicator.Close[0] >= _indicator.Open[0] && _indicator.Close[0] <= _indicator.Open[0] + _indicator.TickSize) ||
+                    (_indicator.Close[0] <= _indicator.Open[0] && _indicator.Close[0] >= _indicator.Open[0] - _indicator.TickSize));
         }
 
-        public static bool IsBearishHarami(Indicator indicator, int trendWeigh, bool isUptrend)
+        public   bool IsBearishHarami(  int trendWeigh, bool isUptrend)
         {
-            if (indicator.CurrentBar < 1 || (IsBearTrend(trendWeigh, isUptrend)))
+            if (_indicator.CurrentBar < 1 || (IsBearTrend(trendWeigh, isUptrend)))
                 return false;
 
-            return indicator.Close[0] < indicator.Open[0] && indicator.Close[1] > indicator.Open[1] &&
-                   indicator.Low[0] >= indicator.Open[1] && indicator.High[0] <= indicator.Close[1];
+            return _indicator.Close[0] < _indicator.Open[0] && _indicator.Close[1] > _indicator.Open[1] &&
+                   _indicator.Low[0] >= _indicator.Open[1] && _indicator.High[0] <= _indicator.Close[1];
         }
 
-        public static bool IsBullTrend(int trendWeight, bool isDownTrend)
+        public   bool IsBullTrend(int trendWeight, bool isDownTrend)
         {
             return trendWeight > 0 && !isDownTrend;
         }
 
-        public static bool IsBullishBeltHold(Indicator indicator, int trendWeight, bool isDowntrend)
+        public   bool IsBullishBeltHold(  int trendWeight, bool isDowntrend)
         {
-            if (indicator.CurrentBar < 1 || (IsBullTrend(trendWeight, isDowntrend)))
+            if (_indicator.CurrentBar < 1 || (IsBullTrend(trendWeight, isDowntrend)))
                 return false;
 
-            return indicator.Close[1] < indicator.Open[1] && indicator.Open[0] < indicator.Close[1] - 5 * indicator.TickSize && indicator.Open[0] == indicator.Low[0] && indicator.Close[0] > indicator.Open[0];
+            return _indicator.Close[1] < _indicator.Open[1] && _indicator.Open[0] < _indicator.Close[1] - 5 * _indicator.TickSize && _indicator.Open[0] == _indicator.Low[0] && _indicator.Close[0] > _indicator.Open[0];
         }
 
-        public static bool IsBullishHarami(Indicator indicator, int trendWeight, bool isDownTrend)
+        public   bool IsBullishHarami(  int trendWeight, bool isDownTrend)
         {
-            if (indicator.CurrentBar < 1 || (IsBullTrend(trendWeight, isDownTrend)))
+            if (_indicator.CurrentBar < 1 || (IsBullTrend(trendWeight, isDownTrend)))
                 return false;
 
-            return indicator.Close[0] > indicator.Open[0] && indicator.Close[1] < indicator.Open[1] && indicator.Low[0] >= indicator.Close[1] && indicator.High[0] <= indicator.Open[1];
+            return _indicator.Close[0] > _indicator.Open[0] && _indicator.Close[1] < _indicator.Open[1] && _indicator.Low[0] >= _indicator.Close[1] && _indicator.High[0] <= _indicator.Open[1];
         }
 
-        public static  bool IsBullishEngulfing(Indicator indicator, int trendWeight, bool isDownTrend)
+        public    bool IsBullishEngulfing(  int trendWeight, bool isDownTrend)
         {
-            if (indicator.CurrentBar < 1 || (IsBullTrend(trendWeight, isDownTrend)))
+            if (_indicator.CurrentBar < 1 || (IsBullTrend(trendWeight, isDownTrend)))
                 return false;
 
 
-            return indicator.Close[1] < indicator.Open[1] && indicator.Close[0] > indicator.Open[0] && indicator.Close[0] > indicator.Open[1] && indicator.Open[0] < indicator.Close[1];
+            return _indicator.Close[1] < _indicator.Open[1] && _indicator.Close[0] > _indicator.Open[0] && _indicator.Close[0] > _indicator.Open[1] && _indicator.Open[0] < _indicator.Close[1];
         }
 
-        public  static bool IsEveningStar(Indicator indicator)
+        public    bool IsEveningStar()
         {
 
-            if (indicator.CurrentBar < 2)
+            if (_indicator.CurrentBar < 2)
                 return false;
 
-            return indicator.Close[2] > indicator.Open[2] && indicator.Close[1] > indicator.Close[2] &&
-                   indicator.Open[0] < (Math.Abs((indicator.Close[1] - indicator.Open[1]) / 2) + indicator.Open[1]) && indicator.Close[0] < indicator.Open[0];
+            return _indicator.Close[2] > _indicator.Open[2] && _indicator.Close[1] > _indicator.Close[2] &&
+                   _indicator.Open[0] < (Math.Abs((_indicator.Close[1] - _indicator.Open[1]) / 2) + _indicator.Open[1]) && _indicator.Close[0] < _indicator.Open[0];
         }
 
-        public static bool IsDownsideTasukiGap(Indicator indicator)
+        public   bool IsDownsideTasukiGap()
         {
 
-            if (indicator.CurrentBar < 2)
+            if (_indicator.CurrentBar < 2)
                 return false;
 
-            return indicator.Close[2] < indicator.Open[2] && indicator.Close[1] < indicator.Open[1] && indicator.Close[0] > indicator.Open[0]
-                   && indicator.High[1] < indicator.Low[2]
-                   && indicator.Open[0] > indicator.Close[1] && indicator.Open[0] < indicator.Open[1]
-                   && indicator.Close[0] > indicator.Open[1] && indicator.Close[0] < indicator.Close[2];
+            return _indicator.Close[2] < _indicator.Open[2] && _indicator.Close[1] < _indicator.Open[1] && _indicator.Close[0] > _indicator.Open[0]
+                   && _indicator.High[1] < _indicator.Low[2]
+                   && _indicator.Open[0] > _indicator.Close[1] && _indicator.Open[0] < _indicator.Open[1]
+                   && _indicator.Close[0] > _indicator.Open[1] && _indicator.Close[0] < _indicator.Close[2];
         }
 
-        public static bool IsDarkCloudCover(Indicator indicater, int trendWeight, bool isUptread)
+        public   bool IsDarkCloudCover(int trendWeight, bool isUptread)
         {
 
-            if (indicater.CurrentBar < 1 || (IsBullTrend(trendWeight, isUptread)))
+            if (_indicator.CurrentBar < 1 || (IsBullTrend(trendWeight, isUptread)))
                 return false;
 
-            return indicater.Open[0] > indicater.High[1] && indicater.Close[1] > indicater.Open[1] && indicater.Close[0] < indicater.Open[0] &&
-                   indicater.Close[0] <= indicater.Close[1] - (indicater.Close[1] - indicater.Open[1]) / 2 && indicater.Close[0] >= indicater.Open[1];
+            return _indicator.Open[0] > _indicator.High[1] && _indicator.Close[1] > _indicator.Open[1] && _indicator.Close[0] < _indicator.Open[0] &&
+                   _indicator.Close[0] <= _indicator.Close[1] - (_indicator.Close[1] - _indicator.Open[1]) / 2 && _indicator.Close[0] >= _indicator.Open[1];
         }
 
-        public static bool IsBullishHaramiCross(Indicator indicater, int trendWeight, bool isDownTrend)
+        public   bool IsBullishHaramiCross( int trendWeight, bool isDownTrend)
         {
-            if (indicater.CurrentBar < 1 || (IsBullTrend(trendWeight, isDownTrend)))
+            if (_indicator.CurrentBar < 1 || (IsBullTrend(trendWeight, isDownTrend)))
                 return false;
 
-            return (indicater.High[0] <= indicater.Open[1]) && (indicater.Low[0] >= indicater.Close[1]) && indicater.Open[0] >= indicater.Close[1] && indicater.Close[0] <= indicater.Open[1] &&
-                   ((indicater.Close[0] >= indicater.Open[0] && indicater.Close[0] <= indicater.Open[0] + indicater.TickSize) ||
-                    (indicater.Close[0] <= indicater.Open[0] && indicater.Close[0] >= indicater.Open[0] - indicater.TickSize));
+            return (_indicator.High[0] <= _indicator.Open[1]) && (_indicator.Low[0] >= _indicator.Close[1]) && _indicator.Open[0] >= _indicator.Close[1] && _indicator.Close[0] <= _indicator.Open[1] &&
+                   ((_indicator.Close[0] >= _indicator.Open[0] && _indicator.Close[0] <= _indicator.Open[0] + _indicator.TickSize) ||
+                    (_indicator.Close[0] <= _indicator.Open[0] && _indicator.Close[0] >= _indicator.Open[0] - _indicator.TickSize));
         }
 
-        public static bool IsInvertedHammer(Indicator indicator, int trendWeight, bool isUptrend)
+        public   bool IsInvertedHammer(  int trendWeight, bool isUptrend)
         {
 
             if (trendWeight > 0)
             {
-                if (!isUptrend || indicator.MAX(indicator.High, trendWeight)[0] != indicator.High[0])
+                if (!isUptrend || _indicator.MAX(_indicator.High, trendWeight)[0] != _indicator.High[0])
                     return false;
             }
 
-            return indicator.High[0] > indicator.Open[0] + 5 * indicator.TickSize && Math.Abs(indicator.Open[0] - indicator.Close[0]) < (0.10 * (indicator.High[0] - indicator.Low[0])) &&
-                   (indicator.Close[0] - indicator.Low[0]) < (0.25 * (indicator.High[0] - indicator.Low[0]));
+            return _indicator.High[0] > _indicator.Open[0] + 5 * _indicator.TickSize && Math.Abs(_indicator.Open[0] - _indicator.Close[0]) < (0.10 * (_indicator.High[0] - _indicator.Low[0])) &&
+                   (_indicator.Close[0] - _indicator.Low[0]) < (0.25 * (_indicator.High[0] - _indicator.Low[0]));
         }
 
-        public static bool IsHangingMan(Indicator indicator, int trendWeight, bool isUptrend)
+        public   bool IsHangingMan(  int trendWeight, bool isUptrend)
         {
             if (trendWeight > 0)
             {
-                if (!isUptrend || indicator.MAX(indicator.High, trendWeight)[0] != indicator.High[0])
+                if (!isUptrend || _indicator.MAX(_indicator.High, trendWeight)[0] != _indicator.High[0])
                     return false;
             }
 
 
-            return indicator.Low[0] < indicator.Open[0] - 5 * indicator.TickSize && Math.Abs(indicator.Open[0] - indicator.Close[0]) < (0.10 * (indicator.High[0] - indicator.Low[0])) &&
-                   (indicator.High[0] - indicator.Close[0]) < (0.25 * (indicator.High[0] - indicator.Low[0]));
+            return _indicator.Low[0] < _indicator.Open[0] - 5 * _indicator.TickSize && Math.Abs(_indicator.Open[0] - _indicator.Close[0]) < (0.10 * (_indicator.High[0] - _indicator.Low[0])) &&
+                   (_indicator.High[0] - _indicator.Close[0]) < (0.25 * (_indicator.High[0] - _indicator.Low[0]));
         }
 
-        public static bool IsHammer(Indicator indicator, int trendWeight, bool isDownTrend)
+        public   bool IsHammer(  int trendWeight, bool isDownTrend)
         {
             if (trendWeight > 0)
             {
-                if (!isDownTrend || indicator.MIN(indicator.Low, trendWeight)[0] != indicator.Low[0])
+                if (!isDownTrend || _indicator.MIN(_indicator.Low, trendWeight)[0] != _indicator.Low[0])
                     return false;
             }
 
 
-            return indicator.Low[0] < indicator.Open[0] - 5 * indicator.TickSize && Math.Abs(indicator.Open[0] - indicator.Close[0]) < (0.10 * (indicator.High[0] - indicator.Low[0])) &&
-                   (indicator.High[0] - indicator.Close[0]) < (0.25 * (indicator.High[0] - indicator.Low[0]));
+            return _indicator.Low[0] < _indicator.Open[0] - 5 * _indicator.TickSize && Math.Abs(_indicator.Open[0] - _indicator.Close[0]) < (0.10 * (_indicator.High[0] - _indicator.Low[0])) &&
+                   (_indicator.High[0] - _indicator.Close[0]) < (0.25 * (_indicator.High[0] - _indicator.Low[0]));
         }
 
-        public static bool IsFallingThree(Indicator indicator)
+        public   bool IsFallingThree()
         {
 
-            if (indicator.CurrentBar < 5)
+            if (_indicator.CurrentBar < 5)
                 return false;
 
-            return indicator.Close[4] < indicator.Open[4] && indicator.Close[0] < indicator.Open[0] && indicator.Close[0] < indicator.Low[4]
-                   && indicator.High[3] < indicator.High[4] && indicator.Low[3] > indicator.Low[4]
-                   && indicator.High[2] < indicator.High[4] && indicator.Low[2] > indicator.Low[4]
-                   && indicator.High[1] < indicator.High[4] && indicator.Low[1] > indicator.Low[4];
+            return _indicator.Close[4] < _indicator.Open[4] && _indicator.Close[0] < _indicator.Open[0] && _indicator.Close[0] < _indicator.Low[4]
+                   && _indicator.High[3] < _indicator.High[4] && _indicator.Low[3] > _indicator.Low[4]
+                   && _indicator.High[2] < _indicator.High[4] && _indicator.Low[2] > _indicator.Low[4]
+                   && _indicator.High[1] < _indicator.High[4] && _indicator.Low[1] > _indicator.Low[4];
         }
 
-        public static bool IsUpsideTasukiGap(Indicator indicator)
+        public   bool IsUpsideTasukiGap()
         {
 
-            if (indicator.CurrentBar < 2)
+            if (_indicator.CurrentBar < 2)
                 return false;
 
-            return indicator.Close[2] > indicator.Open[2] && indicator.Close[1] > indicator.Open[1] && indicator.Close[0] < indicator.Open[0]
-                   && indicator.Low[1] > indicator.High[2]
-                   && indicator.Open[0] < indicator.Close[1] && indicator.Open[0] > indicator.Open[1]
-                   && indicator.Close[0] < indicator.Open[1] && indicator.Close[0] > indicator.Close[2];
+            return _indicator.Close[2] > _indicator.Open[2] && _indicator.Close[1] > _indicator.Open[1] && _indicator.Close[0] < _indicator.Open[0]
+                   && _indicator.Low[1] > _indicator.High[2]
+                   && _indicator.Open[0] < _indicator.Close[1] && _indicator.Open[0] > _indicator.Open[1]
+                   && _indicator.Close[0] < _indicator.Open[1] && _indicator.Close[0] > _indicator.Close[2];
         }
 
-        public static bool IsUpsideGapTwoCrows(Indicator indicator, int trendWeight, bool isUpTrend)
+        public   bool IsUpsideGapTwoCrows(  int trendWeight, bool isUpTrend)
         {
 
-            if (indicator.CurrentBar < 2 || (trendWeight > 0 && !isUpTrend))
+            if (_indicator.CurrentBar < 2 || (trendWeight > 0 && !isUpTrend))
                 return false;
 
-            return indicator.Close[2] > indicator.Open[2] && indicator.Close[1] < indicator.Open[1] && indicator.Close[0] < indicator.Open[0]
-                   && indicator.Low[1] > indicator.High[2]
-                   && indicator.Close[0] > indicator.High[2]
-                   && indicator.Close[0] < indicator.Close[1] && indicator.Open[0] > indicator.Open[1];
+            return _indicator.Close[2] > _indicator.Open[2] && _indicator.Close[1] < _indicator.Open[1] && _indicator.Close[0] < _indicator.Open[0]
+                   && _indicator.Low[1] > _indicator.High[2]
+                   && _indicator.Close[0] > _indicator.High[2]
+                   && _indicator.Close[0] < _indicator.Close[1] && _indicator.Open[0] > _indicator.Open[1];
         }
 
-        public static bool IsThreeWhiteSoldiers(Indicator indicator, int trendWeight, bool isDownTrend)
+        public   bool IsThreeWhiteSoldiers(  int trendWeight, bool isDownTrend)
         {
 
-            if (indicator.CurrentBar < 2 || (IsBullTrend(trendWeight, isDownTrend)))
+            if (_indicator.CurrentBar < 2 || (IsBullTrend(trendWeight, isDownTrend)))
                 return false;
 
-            return indicator.Value[1] == 0 && indicator.Value[2] == 0
-                   && indicator.Close[0] > indicator.Open[0] && indicator.Close[1] > indicator.Open[1] && indicator.Close[2] > indicator.Open[2]
-                   && indicator.Close[0] > indicator.Close[1] && indicator.Close[1] > indicator.Close[2]
-                   && indicator.Open[0] < indicator.Close[1] && indicator.Open[0] > indicator.Open[1]
-                   && indicator.Open[1] < indicator.Close[2] && indicator.Open[1] > indicator.Open[2];
+            return _indicator.Value[1] == 0 && _indicator.Value[2] == 0
+                   && _indicator.Close[0] > _indicator.Open[0] && _indicator.Close[1] > _indicator.Open[1] && _indicator.Close[2] > _indicator.Open[2]
+                   && _indicator.Close[0] > _indicator.Close[1] && _indicator.Close[1] > _indicator.Close[2]
+                   && _indicator.Open[0] < _indicator.Close[1] && _indicator.Open[0] > _indicator.Open[1]
+                   && _indicator.Open[1] < _indicator.Close[2] && _indicator.Open[1] > _indicator.Open[2];
         }
 
-        public static bool IsThreeBlackCrows(Indicator indicator, int trendWeight, bool isUpTrend)
+        public   bool IsThreeBlackCrows(  int trendWeight, bool isUpTrend)
         {
-            if (indicator.CurrentBar < 2 || (trendWeight > 0 && !isUpTrend))
-                return false;
-
-
-            return indicator.Value[1] == 0 && indicator.Value[2] == 0
-                   && indicator.Close[0] < indicator.Open[0] && indicator.Close[1] < indicator.Open[1] && indicator.Close[2] < indicator.Open[2]
-                   && indicator.Close[0] < indicator.Close[1] && indicator.Close[1] < indicator.Close[2]
-                   && indicator.Open[0] < indicator.Open[1] && indicator.Open[0] > indicator.Close[1]
-                   && indicator.Open[1] < indicator.Open[2] && indicator.Open[1] > indicator.Close[2];
-        }
-
-        public  static bool IsStickSandwich(Indicator indicator)
-        {
-            if (indicator.CurrentBar < 2)
-                return false;
-
-            return indicator.Close[2] == indicator.Close[0] && indicator.Close[2] < indicator.Open[2] && indicator.Close[1] > indicator.Open[1] && indicator.Close[0] < indicator.Open[0];
-        }
-
-        public static bool IsShootingStar(Indicator indicator, int trendWeight, bool isUpTrend)
-        {
-
-            if (indicator.CurrentBar < 1 || (trendWeight > 0 && !isUpTrend))
+            if (_indicator.CurrentBar < 2 || (trendWeight > 0 && !isUpTrend))
                 return false;
 
 
-            return indicator.High[0] > indicator.Open[0] && (indicator.High[0] - indicator.Open[0]) >= 2 * (indicator.Open[0] - indicator.Close[0]) && indicator.Close[0] < indicator.Open[0] &&
-                   (indicator.Close[0] - indicator.Low[0]) <= 2 * indicator.TickSize;
+            return _indicator.Value[1] == 0 && _indicator.Value[2] == 0
+                   && _indicator.Close[0] < _indicator.Open[0] && _indicator.Close[1] < _indicator.Open[1] && _indicator.Close[2] < _indicator.Open[2]
+                   && _indicator.Close[0] < _indicator.Close[1] && _indicator.Close[1] < _indicator.Close[2]
+                   && _indicator.Open[0] < _indicator.Open[1] && _indicator.Open[0] > _indicator.Close[1]
+                   && _indicator.Open[1] < _indicator.Open[2] && _indicator.Open[1] > _indicator.Close[2];
         }
 
-        public static bool IsRisingThree(Indicator indicator)
+        public    bool IsStickSandwich()
         {
-
-            if (indicator.CurrentBar < 5)
+            if (_indicator.CurrentBar < 2)
                 return false;
 
-            return indicator.Close[4] > indicator.Open[4] && indicator.Close[0] > indicator.Open[0] && indicator.Close[0] > indicator.High[4]
-                   && indicator.High[3] < indicator.High[4] && indicator.Low[3] > indicator.Low[4]
-                   && indicator.High[2] < indicator.High[4] && indicator.Low[2] > indicator.Low[4]
-                   && indicator.High[1] < indicator.High[4] && indicator.Low[1] > indicator.Low[4];
+            return _indicator.Close[2] == _indicator.Close[0] && _indicator.Close[2] < _indicator.Open[2] && _indicator.Close[1] > _indicator.Open[1] && _indicator.Close[0] < _indicator.Open[0];
         }
 
-        public static bool IsPiercingLine(Indicator indicator, int trendWeight, bool isDownTrend)
+        public   bool IsShootingStar(  int trendWeight, bool isUpTrend)
         {
-            if (indicator.CurrentBar < 1 || (IsBullTrend(trendWeight, isDownTrend)))
+
+            if (_indicator.CurrentBar < 1 || (trendWeight > 0 && !isUpTrend))
                 return false;
-            return indicator.Open[0] < indicator.Low[1] && indicator.Close[1] < indicator.Open[1] &&
-                   indicator.Close[0] > indicator.Open[0] &&
-                   indicator.Close[0] >= indicator.Close[1] + (indicator.Open[1] - indicator.Close[1])/2 &&
-                   indicator.Close[0] <= indicator.Open[1];
+
+
+            return _indicator.High[0] > _indicator.Open[0] && (_indicator.High[0] - _indicator.Open[0]) >= 2 * (_indicator.Open[0] - _indicator.Close[0]) && _indicator.Close[0] < _indicator.Open[0] &&
+                   (_indicator.Close[0] - _indicator.Low[0]) <= 2 * _indicator.TickSize;
         }
 
-        public static bool IsMorningStar(Indicator indicator)
+        public   bool IsRisingThree()
         {
-            if (indicator.CurrentBar < 2)
+
+            if (_indicator.CurrentBar < 5)
                 return false;
 
-            return indicator.Close[2] < indicator.Open[2] && indicator.Close[1] < indicator.Close[2] &&
-                   indicator.Open[0] > (Math.Abs((indicator.Close[1] - indicator.Open[1])/2) + indicator.Open[1]) &&
-                   indicator.Close[0] > indicator.Open[0];
+            return _indicator.Close[4] > _indicator.Open[4] && _indicator.Close[0] > _indicator.Open[0] && _indicator.Close[0] > _indicator.High[4]
+                   && _indicator.High[3] < _indicator.High[4] && _indicator.Low[3] > _indicator.Low[4]
+                   && _indicator.High[2] < _indicator.High[4] && _indicator.Low[2] > _indicator.Low[4]
+                   && _indicator.High[1] < _indicator.High[4] && _indicator.Low[1] > _indicator.Low[4];
+        }
+
+        public   bool IsPiercingLine(  int trendWeight, bool isDownTrend)
+        {
+            if (_indicator.CurrentBar < 1 || (IsBullTrend(trendWeight, isDownTrend)))
+                return false;
+            return _indicator.Open[0] < _indicator.Low[1] && _indicator.Close[1] < _indicator.Open[1] &&
+                   _indicator.Close[0] > _indicator.Open[0] &&
+                   _indicator.Close[0] >= _indicator.Close[1] + (_indicator.Open[1] - _indicator.Close[1])/2 &&
+                   _indicator.Close[0] <= _indicator.Open[1];
+        }
+
+        public   bool IsMorningStar()
+        {
+            if (_indicator.CurrentBar < 2)
+                return false;
+
+            return _indicator.Close[2] < _indicator.Open[2] && _indicator.Close[1] < _indicator.Close[2] &&
+                   _indicator.Open[0] > (Math.Abs((_indicator.Close[1] - _indicator.Open[1])/2) + _indicator.Open[1]) &&
+                   _indicator.Close[0] > _indicator.Open[0];
         }
     }
 }

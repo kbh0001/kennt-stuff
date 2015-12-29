@@ -81,6 +81,9 @@ namespace NinjaTrader.Indicator
         /// </summary>
         protected override void OnBarUpdate()
         {
+
+            var candleStickDeterminer = new KenCandleStickDeterminer(this);
+
             if (CurrentBar == 0 && ChartControl != null)
             {
                 downColor = ChartControl.GetAxisBrush(ChartControl.BackColor).Color;
@@ -101,7 +104,7 @@ namespace NinjaTrader.Indicator
             {
                 case ChartPattern.BearishBeltHold:
                 {
-                    if (KenCandleStickDeterminer.IsBearishBeltHold(this, TrendStrength, upTrend))
+                    if (candleStickDeterminer.IsBearishBeltHold( TrendStrength, upTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -122,7 +125,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.BearishEngulfing:
                 {
-                    if (KenCandleStickDeterminer.IsBearishEngulfing(this, TrendStrength, upTrend))
+                    if (candleStickDeterminer.IsBearishEngulfing(TrendStrength, upTrend))
                     {
                         BarColor = downColor;
                         DrawText("Bearish Engulfing" + CurrentBar, false, "Bearish Engulfing", 0, Low[0], -10, txtColor,
@@ -135,7 +138,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.BearishHarami:
                 {
-                    if (KenCandleStickDeterminer.IsBearishHarami(this, TrendStrength, upTrend))
+                    if (candleStickDeterminer.IsBearishHarami( TrendStrength, upTrend))
                     {
                         BarColor = downColor;
                         DrawText("Bearish Harami" + CurrentBar, false, "Bearish Harami", 0, Low[0], -10, txtColor,
@@ -149,7 +152,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.BearishHaramiCross:
                 {
-                    if (KenCandleStickDeterminer.IsBearishHaramiCross(this, TrendStrength, upTrend))
+                    if (candleStickDeterminer.IsBearishHaramiCross( TrendStrength, upTrend))
                     {
                         BarColor = downColor;
                         DrawText("Bearish Harami Cross" + CurrentBar, false, "Bearish Harami Cross", 0, Low[0], -10,
@@ -163,7 +166,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.BullishBeltHold:
                 {
-                    if (KenCandleStickDeterminer.IsBullishBeltHold(this, TrendStrength, downTrend))
+                    if (candleStickDeterminer.IsBullishBeltHold(TrendStrength, downTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -185,7 +188,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.BullishEngulfing:
                 {
-                    if (KenCandleStickDeterminer.IsBullishEngulfing(this, TrendStrength, downTrend))
+                    if (candleStickDeterminer.IsBullishEngulfing( TrendStrength, downTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -205,7 +208,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.BullishHarami:
                 {
-                    if (KenCandleStickDeterminer.IsBullishHarami(this, TrendStrength, downTrend))
+                    if (candleStickDeterminer.IsBullishHarami( TrendStrength, downTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -224,7 +227,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.BullishHaramiCross:
                 {
-                    if (KenCandleStickDeterminer.IsBullishHaramiCross(this, TrendStrength, downTrend))
+                    if (candleStickDeterminer.IsBullishHaramiCross(TrendStrength, downTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -243,7 +246,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.DarkCloudCover:
                 {
-                    if (KenCandleStickDeterminer.IsDarkCloudCover(this, trendStrength, upTrend))
+                    if (candleStickDeterminer.IsDarkCloudCover(trendStrength, upTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -265,11 +268,11 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.Doji:
                 {
-                    if (KenCandleStickDeterminer.IsBullTrend(trendStrength, downTrend))
+                    if (candleStickDeterminer.IsBullTrend(trendStrength, downTrend))
                         return;
 
 
-                    if (KenCandleStickDeterminer.IsBasicDoji(this))
+                    if (candleStickDeterminer.IsBasicDoji())
                     {
                         if (ChartControl != null)
                         {
@@ -291,7 +294,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.DownsideTasukiGap:
                 {
-                    if (KenCandleStickDeterminer.IsDownsideTasukiGap(this))
+                    if (candleStickDeterminer.IsDownsideTasukiGap())
                     {
                         if (ChartControl != null)
                         {
@@ -314,7 +317,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.EveningStar:
                 {
-                    if (KenCandleStickDeterminer.IsEveningStar(this))
+                    if (candleStickDeterminer.IsEveningStar())
                     {
                         if (ChartControl != null)
                         {
@@ -356,7 +359,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.FallingThreeMethods:
                 {
-                    if (KenCandleStickDeterminer.IsFallingThree(this))
+                    if (candleStickDeterminer.IsFallingThree())
                     {
                         if (ChartControl != null)
                         {
@@ -391,7 +394,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.Hammer:
                 {
-                    if (KenCandleStickDeterminer.IsHammer(this, TrendStrength, downTrend))
+                    if (candleStickDeterminer.IsHammer( TrendStrength, downTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -417,7 +420,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.HangingMan:
                 {
-                    if (KenCandleStickDeterminer.IsHangingMan(this, TrendStrength, upTrend))
+                    if (candleStickDeterminer.IsHangingMan( TrendStrength, upTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -441,7 +444,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.InvertedHammer:
                 {
-                    if (KenCandleStickDeterminer.IsInvertedHammer(this, TrendStrength, upTrend))
+                    if (candleStickDeterminer.IsInvertedHammer( TrendStrength, upTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -467,7 +470,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.MorningStar:
                 {
-                    if (KenCandleStickDeterminer.IsMorningStar(this))
+                    if (candleStickDeterminer.IsMorningStar())
                     {
                         if (ChartControl != null)
                         {
@@ -509,7 +512,7 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.PiercingLine:
                 {
-                    if (KenCandleStickDeterminer.IsPiercingLine(this, TrendStrength, downTrend))
+                    if (candleStickDeterminer.IsPiercingLine( TrendStrength, downTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -533,7 +536,7 @@ namespace NinjaTrader.Indicator
                 {
                     
 
-                    if (KenCandleStickDeterminer.IsRisingThree(this))
+                    if (candleStickDeterminer.IsRisingThree())
                     {
                         if (ChartControl != null)
                         {
@@ -572,7 +575,7 @@ namespace NinjaTrader.Indicator
                 {
                     
 
-                    if (KenCandleStickDeterminer.IsShootingStar(this, TrendStrength, upTrend))
+                    if (candleStickDeterminer.IsShootingStar( TrendStrength, upTrend))
                     {
                         if (ChartControl != null)
                             BarColor = downColor;
@@ -592,7 +595,7 @@ namespace NinjaTrader.Indicator
                 {
                    
 
-                    if (KenCandleStickDeterminer.IsStickSandwich(this))
+                    if (candleStickDeterminer.IsStickSandwich())
                     {
                         if (ChartControl != null)
                         {
@@ -618,7 +621,7 @@ namespace NinjaTrader.Indicator
                 {
                     
 
-                    if (KenCandleStickDeterminer.IsThreeBlackCrows(this, TrendStrength, upTrend))
+                    if (candleStickDeterminer.IsThreeBlackCrows( TrendStrength, upTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -642,7 +645,7 @@ namespace NinjaTrader.Indicator
                 {
                     
 
-                    if (KenCandleStickDeterminer.IsThreeWhiteSoldiers(this, TrendStrength, downTrend))
+                    if (candleStickDeterminer.IsThreeWhiteSoldiers(TrendStrength, downTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -669,7 +672,7 @@ namespace NinjaTrader.Indicator
                 {
                     
 
-                    if (KenCandleStickDeterminer.IsUpsideGapTwoCrows(this, TrendStrength, upTrend))
+                    if (candleStickDeterminer.IsUpsideGapTwoCrows(TrendStrength, upTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -695,7 +698,7 @@ namespace NinjaTrader.Indicator
                 {
                    
 
-                    if (KenCandleStickDeterminer.IsUpsideTasukiGap(this))
+                    if (candleStickDeterminer.IsUpsideTasukiGap())
                     {
                         if (ChartControl != null)
                         {
