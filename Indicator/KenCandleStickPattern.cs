@@ -3,18 +3,15 @@
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 
-#region Using declarations
 
 using System;
-using System.Drawing;
 using System.ComponentModel;
+using System.Drawing;
 using System.Xml.Serialization;
 using NinjaTrader.Data;
 using NinjaTrader.Gui.Chart;
-using NinjaTrader.Indicator;
 using NinjaTrader.Gui.Design;
-
-#endregion
+using NinjaTrader.Indicator;
 
 // This namespace holds all indicators and is required. Do not change it.
 
@@ -28,7 +25,7 @@ namespace NinjaTrader.Indicator
     [Description("Ken Detects common candlestick patterns and marks them on the chart.")]
     public class KenCandleStickPattern : Indicator
     {
-        private readonly Font textFont = new Font("Arial", 12, FontStyle.Bold);
+        private readonly Font textFont = new Font("Arial", 8, FontStyle.Regular);
         private Color downColor;
         private bool downTrend;
         private ChartPattern pattern = ChartPattern.MorningStar;
@@ -166,10 +163,6 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.BullishBeltHold:
                 {
-                    #region Bullish Belt Hold
-
-                    
-
                     if (KenCandleStickDeterminer.IsBullishBeltHold(this, TrendStrength, downTrend))
                     {
                         if (ChartControl != null)
@@ -186,14 +179,12 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.BullishEngulfing:
                 {
-
                     if (KenCandleStickDeterminer.IsBullishEngulfing(this, TrendStrength, downTrend))
                     {
                         if (ChartControl != null)
@@ -252,10 +243,6 @@ namespace NinjaTrader.Indicator
 
                 case ChartPattern.DarkCloudCover:
                 {
-                    #region Dark Cloud Cover
-
-                    
-
                     if (KenCandleStickDeterminer.IsDarkCloudCover(this, trendStrength, upTrend))
                     {
                         if (ChartControl != null)
@@ -272,15 +259,12 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.Doji:
                 {
-                    #region Doji
-
                     if (KenCandleStickDeterminer.IsBullTrend(trendStrength, downTrend))
                         return;
 
@@ -301,17 +285,12 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.DownsideTasukiGap:
                 {
-                    #region Downside Tasuki Gap
-
-                   
-
                     if (KenCandleStickDeterminer.IsDownsideTasukiGap(this))
                     {
                         if (ChartControl != null)
@@ -329,17 +308,12 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.EveningStar:
                 {
-                    #region Evening Star
-
-                   
-
                     if (KenCandleStickDeterminer.IsEveningStar(this))
                     {
                         if (ChartControl != null)
@@ -376,22 +350,13 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.FallingThreeMethods:
                 {
-                    #region Falling Three Methods
-
-                    if (CurrentBar < 5)
-                        return;
-
-                    if (Close[4] < Open[4] && Close[0] < Open[0] && Close[0] < Low[4]
-                        && High[3] < High[4] && Low[3] > Low[4]
-                        && High[2] < High[4] && Low[2] > Low[4]
-                        && High[1] < High[4] && Low[1] > Low[4])
+                    if (KenCandleStickDeterminer.IsFallingThree(this))
                     {
                         if (ChartControl != null)
                         {
@@ -420,23 +385,13 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.Hammer:
                 {
-                    #region Hammer
-
-                    if (TrendStrength > 0)
-                    {
-                        if (!downTrend || MIN(Low, TrendStrength)[0] != Low[0])
-                            return;
-                    }
-
-                    if (Low[0] < Open[0] - 5*TickSize && Math.Abs(Open[0] - Close[0]) < (0.10*(High[0] - Low[0])) &&
-                        (High[0] - Close[0]) < (0.25*(High[0] - Low[0])))
+                    if (KenCandleStickDeterminer.IsHammer(this, TrendStrength, downTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -456,23 +411,13 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.HangingMan:
                 {
-                    #region Hanging Man
-
-                    if (TrendStrength > 0)
-                    {
-                        if (!upTrend || MAX(High, TrendStrength)[0] != High[0])
-                            return;
-                    }
-
-                    if (Low[0] < Open[0] - 5*TickSize && Math.Abs(Open[0] - Close[0]) < (0.10*(High[0] - Low[0])) &&
-                        (High[0] - Close[0]) < (0.25*(High[0] - Low[0])))
+                    if (KenCandleStickDeterminer.IsHangingMan(this, TrendStrength, upTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -491,24 +436,12 @@ namespace NinjaTrader.Indicator
                         patternsFound++;
                         Value.Set(1);
                     }
-
-                    #endregion
-
                     break;
                 }
 
                 case ChartPattern.InvertedHammer:
                 {
-                    #region Inverted Hammer
-
-                    if (TrendStrength > 0)
-                    {
-                        if (!upTrend || MAX(High, TrendStrength)[0] != High[0])
-                            return;
-                    }
-
-                    if (High[0] > Open[0] + 5*TickSize && Math.Abs(Open[0] - Close[0]) < (0.10*(High[0] - Low[0])) &&
-                        (Close[0] - Low[0]) < (0.25*(High[0] - Low[0])))
+                    if (KenCandleStickDeterminer.IsInvertedHammer(this, TrendStrength, upTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -528,20 +461,13 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.MorningStar:
                 {
-                    #region Morning Star
-
-                    if (CurrentBar < 2)
-                        return;
-
-                    if (Close[2] < Open[2] && Close[1] < Close[2] &&
-                        Open[0] > (Math.Abs((Close[1] - Open[1])/2) + Open[1]) && Close[0] > Open[0])
+                    if (KenCandleStickDeterminer.IsMorningStar(this))
                     {
                         if (ChartControl != null)
                         {
@@ -577,20 +503,13 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.PiercingLine:
                 {
-                    #region Piercing Line
-
-                    if (CurrentBar < 1 || (KenCandleStickDeterminer.IsBullTrend(TrendStrength, downTrend)))
-                        return;
-
-                    if (Open[0] < Low[1] && Close[1] < Open[1] && Close[0] > Open[0] &&
-                        Close[0] >= Close[1] + (Open[1] - Close[1])/2 && Close[0] <= Open[1])
+                    if (KenCandleStickDeterminer.IsPiercingLine(this, TrendStrength, downTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -606,22 +525,15 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.RisingThreeMethods:
                 {
-                    #region Rising Three Methods
+                    
 
-                    if (CurrentBar < 5)
-                        return;
-
-                    if (Close[4] > Open[4] && Close[0] > Open[0] && Close[0] > High[4]
-                        && High[3] < High[4] && Low[3] > Low[4]
-                        && High[2] < High[4] && Low[2] > Low[4]
-                        && High[1] < High[4] && Low[1] > Low[4])
+                    if (KenCandleStickDeterminer.IsRisingThree(this))
                     {
                         if (ChartControl != null)
                         {
@@ -652,20 +564,15 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.ShootingStar:
                 {
-                    #region Shooting Star
+                    
 
-                    if (CurrentBar < 1 || (TrendStrength > 0 && !upTrend))
-                        return;
-
-                    if (High[0] > Open[0] && (High[0] - Open[0]) >= 2*(Open[0] - Close[0]) && Close[0] < Open[0] &&
-                        (Close[0] - Low[0]) <= 2*TickSize)
+                    if (KenCandleStickDeterminer.IsShootingStar(this, TrendStrength, upTrend))
                     {
                         if (ChartControl != null)
                             BarColor = downColor;
@@ -677,19 +584,15 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.StickSandwich:
                 {
-                    #region Stick Sandwich
+                   
 
-                    if (CurrentBar < 2)
-                        return;
-
-                    if (Close[2] == Close[0] && Close[2] < Open[2] && Close[1] > Open[1] && Close[0] < Open[0])
+                    if (KenCandleStickDeterminer.IsStickSandwich(this))
                     {
                         if (ChartControl != null)
                         {
@@ -707,23 +610,15 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.ThreeBlackCrows:
                 {
-                    #region Three Black Crows
+                    
 
-                    if (CurrentBar < 2 || (TrendStrength > 0 && !upTrend))
-                        return;
-
-                    if (Value[1] == 0 && Value[2] == 0
-                        && Close[0] < Open[0] && Close[1] < Open[1] && Close[2] < Open[2]
-                        && Close[0] < Close[1] && Close[1] < Close[2]
-                        && Open[0] < Open[1] && Open[0] > Close[1]
-                        && Open[1] < Open[2] && Open[1] > Close[2])
+                    if (KenCandleStickDeterminer.IsThreeBlackCrows(this, TrendStrength, upTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -739,23 +634,15 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.ThreeWhiteSoldiers:
                 {
-                    #region Three White Soldiers
+                    
 
-                    if (CurrentBar < 2 || (KenCandleStickDeterminer.IsBullTrend(TrendStrength, downTrend)))
-                        return;
-
-                    if (Value[1] == 0 && Value[2] == 0
-                        && Close[0] > Open[0] && Close[1] > Open[1] && Close[2] > Open[2]
-                        && Close[0] > Close[1] && Close[1] > Close[2]
-                        && Open[0] < Close[1] && Open[0] > Open[1]
-                        && Open[1] < Close[2] && Open[1] > Open[2])
+                    if (KenCandleStickDeterminer.IsThreeWhiteSoldiers(this, TrendStrength, downTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -774,22 +661,15 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.UpsideGapTwoCrows:
                 {
-                    #region Upside Gap Two Crows
+                    
 
-                    if (CurrentBar < 2 || (TrendStrength > 0 && !upTrend))
-                        return;
-
-                    if (Close[2] > Open[2] && Close[1] < Open[1] && Close[0] < Open[0]
-                        && Low[1] > High[2]
-                        && Close[0] > High[2]
-                        && Close[0] < Close[1] && Open[0] > Open[1])
+                    if (KenCandleStickDeterminer.IsUpsideGapTwoCrows(this, TrendStrength, upTrend))
                     {
                         if (ChartControl != null)
                         {
@@ -807,22 +687,15 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
 
                 case ChartPattern.UpsideTasukiGap:
                 {
-                    #region Upside Tasuki Gap
+                   
 
-                    if (CurrentBar < 2)
-                        return;
-
-                    if (Close[2] > Open[2] && Close[1] > Open[1] && Close[0] < Open[0]
-                        && Low[1] > High[2]
-                        && Open[0] < Close[1] && Open[0] > Open[1]
-                        && Close[0] < Open[1] && Close[0] > Close[2])
+                    if (KenCandleStickDeterminer.IsUpsideTasukiGap(this))
                     {
                         if (ChartControl != null)
                         {
@@ -841,7 +714,6 @@ namespace NinjaTrader.Indicator
                         Value.Set(1);
                     }
 
-                    #endregion
 
                     break;
                 }
@@ -912,14 +784,15 @@ namespace NinjaTrader.Indicator
 }
 
 #region NinjaScript generated code. Neither change nor remove.
+
 // This namespace holds all indicators and is required. Do not change it.
+
 namespace NinjaTrader.Indicator
 {
     public partial class Indicator : IndicatorBase
     {
-        private KenCandleStickPattern[] cacheKenCandleStickPattern = null;
-
-        private static KenCandleStickPattern checkKenCandleStickPattern = new KenCandleStickPattern();
+        private static readonly KenCandleStickPattern checkKenCandleStickPattern = new KenCandleStickPattern();
+        private KenCandleStickPattern[] cacheKenCandleStickPattern;
 
         /// <summary>
         /// Ken Detects common candlestick patterns and marks them on the chart.
@@ -934,11 +807,13 @@ namespace NinjaTrader.Indicator
         /// Ken Detects common candlestick patterns and marks them on the chart.
         /// </summary>
         /// <returns></returns>
-        public KenCandleStickPattern KenCandleStickPattern(Data.IDataSeries input, ChartPattern pattern, int trendStrength)
+        public KenCandleStickPattern KenCandleStickPattern(IDataSeries input, ChartPattern pattern, int trendStrength)
         {
             if (cacheKenCandleStickPattern != null)
-                for (int idx = 0; idx < cacheKenCandleStickPattern.Length; idx++)
-                    if (cacheKenCandleStickPattern[idx].Pattern == pattern && cacheKenCandleStickPattern[idx].TrendStrength == trendStrength && cacheKenCandleStickPattern[idx].EqualsInput(input))
+                for (var idx = 0; idx < cacheKenCandleStickPattern.Length; idx++)
+                    if (cacheKenCandleStickPattern[idx].Pattern == pattern &&
+                        cacheKenCandleStickPattern[idx].TrendStrength == trendStrength &&
+                        cacheKenCandleStickPattern[idx].EqualsInput(input))
                         return cacheKenCandleStickPattern[idx];
 
             lock (checkKenCandleStickPattern)
@@ -949,11 +824,13 @@ namespace NinjaTrader.Indicator
                 trendStrength = checkKenCandleStickPattern.TrendStrength;
 
                 if (cacheKenCandleStickPattern != null)
-                    for (int idx = 0; idx < cacheKenCandleStickPattern.Length; idx++)
-                        if (cacheKenCandleStickPattern[idx].Pattern == pattern && cacheKenCandleStickPattern[idx].TrendStrength == trendStrength && cacheKenCandleStickPattern[idx].EqualsInput(input))
+                    for (var idx = 0; idx < cacheKenCandleStickPattern.Length; idx++)
+                        if (cacheKenCandleStickPattern[idx].Pattern == pattern &&
+                            cacheKenCandleStickPattern[idx].TrendStrength == trendStrength &&
+                            cacheKenCandleStickPattern[idx].EqualsInput(input))
                             return cacheKenCandleStickPattern[idx];
 
-                KenCandleStickPattern indicator = new KenCandleStickPattern();
+                var indicator = new KenCandleStickPattern();
                 indicator.BarsRequired = BarsRequired;
                 indicator.CalculateOnBarClose = CalculateOnBarClose;
 #if NT7
@@ -966,7 +843,9 @@ namespace NinjaTrader.Indicator
                 Indicators.Add(indicator);
                 indicator.SetUp();
 
-                KenCandleStickPattern[] tmp = new KenCandleStickPattern[cacheKenCandleStickPattern == null ? 1 : cacheKenCandleStickPattern.Length + 1];
+                var tmp =
+                    new KenCandleStickPattern[
+                        cacheKenCandleStickPattern == null ? 1 : cacheKenCandleStickPattern.Length + 1];
                 if (cacheKenCandleStickPattern != null)
                     cacheKenCandleStickPattern.CopyTo(tmp, 0);
                 tmp[tmp.Length - 1] = indicator;
@@ -978,6 +857,7 @@ namespace NinjaTrader.Indicator
 }
 
 // This namespace holds all market analyzer column definitions and is required. Do not change it.
+
 namespace NinjaTrader.MarketAnalyzer
 {
     public partial class Column : ColumnBase
@@ -986,8 +866,8 @@ namespace NinjaTrader.MarketAnalyzer
         /// Ken Detects common candlestick patterns and marks them on the chart.
         /// </summary>
         /// <returns></returns>
-        [Gui.Design.WizardCondition("Indicator")]
-        public Indicator.KenCandleStickPattern KenCandleStickPattern(ChartPattern pattern, int trendStrength)
+        [WizardCondition("Indicator")]
+        public KenCandleStickPattern KenCandleStickPattern(ChartPattern pattern, int trendStrength)
         {
             return _indicator.KenCandleStickPattern(Input, pattern, trendStrength);
         }
@@ -996,7 +876,7 @@ namespace NinjaTrader.MarketAnalyzer
         /// Ken Detects common candlestick patterns and marks them on the chart.
         /// </summary>
         /// <returns></returns>
-        public Indicator.KenCandleStickPattern KenCandleStickPattern(Data.IDataSeries input, ChartPattern pattern, int trendStrength)
+        public KenCandleStickPattern KenCandleStickPattern(IDataSeries input, ChartPattern pattern, int trendStrength)
         {
             return _indicator.KenCandleStickPattern(input, pattern, trendStrength);
         }
@@ -1004,6 +884,7 @@ namespace NinjaTrader.MarketAnalyzer
 }
 
 // This namespace holds all strategies and is required. Do not change it.
+
 namespace NinjaTrader.Strategy
 {
     public partial class Strategy : StrategyBase
@@ -1012,8 +893,8 @@ namespace NinjaTrader.Strategy
         /// Ken Detects common candlestick patterns and marks them on the chart.
         /// </summary>
         /// <returns></returns>
-        [Gui.Design.WizardCondition("Indicator")]
-        public Indicator.KenCandleStickPattern KenCandleStickPattern(ChartPattern pattern, int trendStrength)
+        [WizardCondition("Indicator")]
+        public KenCandleStickPattern KenCandleStickPattern(ChartPattern pattern, int trendStrength)
         {
             return _indicator.KenCandleStickPattern(Input, pattern, trendStrength);
         }
@@ -1022,13 +903,15 @@ namespace NinjaTrader.Strategy
         /// Ken Detects common candlestick patterns and marks them on the chart.
         /// </summary>
         /// <returns></returns>
-        public Indicator.KenCandleStickPattern KenCandleStickPattern(Data.IDataSeries input, ChartPattern pattern, int trendStrength)
+        public KenCandleStickPattern KenCandleStickPattern(IDataSeries input, ChartPattern pattern, int trendStrength)
         {
             if (InInitialize && input == null)
-                throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+                throw new ArgumentException(
+                    "You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
             return _indicator.KenCandleStickPattern(input, pattern, trendStrength);
         }
     }
 }
+
 #endregion
