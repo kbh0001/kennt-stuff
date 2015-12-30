@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using Dapper;
 
 // This namespace holds all strategies and is required. Do not change it.
+using KenNinja;
 
 namespace NinjaTrader.Custom.Strategy
 {
@@ -77,7 +78,7 @@ namespace NinjaTrader.Custom.Strategy
 				DtTm = Time[0],
 				Dt = Time[0].Date,
 				Hr = Time[0].Hour,
-                CandleStick = this.KenCandleStickPattern(8)[0]
+                CandleStick = this.KenCandleStickPattern(Kp.All, 8)[0]
 			};
 			
 			try{
