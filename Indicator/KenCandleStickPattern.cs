@@ -8,6 +8,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Xml.Serialization;
+using KenNinja;
 using NinjaTrader.Data;
 using NinjaTrader.Gui.Chart;
 using NinjaTrader.Gui.Design;
@@ -71,156 +72,157 @@ namespace NinjaTrader.Indicator
         /// </summary>
         protected override void OnBarUpdate()
         {
-            var candleStickDeterminer = new KenNinja.KenCandleStickDeterminer(this, TrendStrength, Print);
-
-            if (CurrentBar == 0 && ChartControl != null)
+            try
             {
-                downColor = ChartControl.GetAxisBrush(ChartControl.BackColor).Color;
-                txtColor = downColor;
-                if (downColor == Color.Black)
-                    upColor = Color.Transparent;
-                else
-                    upColor = Color.Black;
-            }
-            Value.Set(0);
-            
-            Print("We is staring");
+                var candleStickDeterminer = new KenNinja.KenCandleStickDeterminer(this, TrendStrength, Print);
 
-
-            if (candleStickDeterminer.IsBearishBeltHold)
-            {
-                if (ChartControl != null)
+                if (CurrentBar == 0 && ChartControl != null)
                 {
-                    BarColorSeries.Set(CurrentBar - 1, upColor);
-                    CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
+                    downColor = ChartControl.GetAxisBrush(ChartControl.BackColor).Color;
+                    txtColor = downColor;
+                    if (downColor == Color.Black)
+                        upColor = Color.Transparent;
+                    else
+                        upColor = Color.Black;
+                }
+                Value.Set(0);
+
+
+
+                //Start identifiying patterns
+                if (candleStickDeterminer.IsBearishBeltHold)
+                {
+                    if (ChartControl != null)
+                    {
+                        BarColorSeries.Set(CurrentBar - 1, upColor);
+                        CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
+                        BarColor = downColor;
+                    }
+
+                    DrawText("Bearish Belt Hold" + CurrentBar, false, "Bearish Belt Hold", 0, High[0], 10, txtColor,
+                        textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(Kp.BearishBeltHold.ToInt());
+                }
+
+
+                if (candleStickDeterminer.IsBearishEngulfing)
+                {
                     BarColor = downColor;
+                    DrawText("Bearish Engulfing" + CurrentBar, false, "Bearish Engulfing", 0, Low[0], -10, txtColor,
+                        textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+                    patternsFound++;
+                    Value.Set(-2);
                 }
 
-                DrawText("Bearish Belt Hold" + CurrentBar, false, "Bearish Belt Hold", 0, High[0], 10, txtColor,
-                    textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
 
-                patternsFound++;
-                Value.Set(-1);
-            }
-
-
-            if (candleStickDeterminer.IsBearishEngulfing)
-            {
-                BarColor = downColor;
-                DrawText("Bearish Engulfing" + CurrentBar, false, "Bearish Engulfing", 0, Low[0], -10, txtColor,
-                    textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-                patternsFound++;
-                Value.Set(-1);
-            }
-
-
-            if (candleStickDeterminer.IsBearishHarami)
-            {
-                BarColor = downColor;
-                DrawText("Bearish Harami" + CurrentBar, false, "Bearish Harami", 0, Low[0], -10, txtColor,
-                    textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-                patternsFound++;
-                Value.Set(-1);
-            }
-
-
-            if (candleStickDeterminer.IsBearishHaramiCross)
-            {
-                BarColor = downColor;
-                DrawText("Bearish Harami Cross" + CurrentBar, false, "Bearish Harami Cross", 0, Low[0], -10,
-                    txtColor, textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-                patternsFound++;
-                Value.Set(-1);
-            }
-
-
-            if (candleStickDeterminer.IsBullishBeltHold)
-            {
-                if (ChartControl != null)
+                if (candleStickDeterminer.IsBearishHarami)
                 {
-                    BarColorSeries.Set(CurrentBar - 1, downColor);
-                    BarColor = upColor;
-                    CandleOutlineColorSeries.Set(CurrentBar, downColor);
-                }
-
-                DrawText("Bullish Belt Hold" + CurrentBar, false, "Bullish Belt Hold", 0, Low[0], -10, txtColor,
-                    textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsBullishEngulfing)
-            {
-                if (ChartControl != null)
-                {
-                    BarColor = upColor;
-                    CandleOutlineColorSeries.Set(CurrentBar, downColor);
-                }
-
-                DrawText("Bullish Engulfing" + CurrentBar, false, "Bullish Engulfing", 0, Low[0], -10, txtColor,
-                    textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsBullishHarami)
-            {
-                if (ChartControl != null)
-                {
-                    BarColor = upColor;
-                    CandleOutlineColorSeries.Set(CurrentBar, downColor);
-                }
-
-                DrawText("Bullish Harami" + CurrentBar, false, "Bullish Harami", 0, Low[0], -10, txtColor,
-                    textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsBullishHaramiCross)
-            {
-                if (ChartControl != null)
-                {
-                    BarColor = upColor;
-                    CandleOutlineColorSeries.Set(CurrentBar, downColor);
-                }
-
-                DrawText("Bullish Harami Cross" + CurrentBar, false, "Bullish Harami Cross", 0, Low[0], -10,
-                    txtColor, textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsDarkCloudCover)
-            {
-                if (ChartControl != null)
-                {
-                    CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
-                    BarColorSeries.Set(CurrentBar - 1, upColor);
                     BarColor = downColor;
+                    DrawText("Bearish Harami" + CurrentBar, false, "Bearish Harami", 0, Low[0], -10, txtColor,
+                        textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+                    patternsFound++;
+                    Value.Set(-3);
                 }
 
-                DrawText("Dark Cloud Cover" + CurrentBar, false, "Dark Cloud Cover", 1, High[0], 10, txtColor,
-                    textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
 
-                patternsFound++;
-                Value.Set(1);
-            }
+                if (candleStickDeterminer.IsBearishHaramiCross)
+                {
+                    BarColor = downColor;
+                    DrawText("Bearish Harami Cross" + CurrentBar, false, "Bearish Harami Cross", 0, Low[0], -10,
+                        txtColor, textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+                    patternsFound++;
+                    Value.Set(-4);
+                }
 
 
-            if (candleStickDeterminer.IsBullTrend)
-                return;
+                if (candleStickDeterminer.IsBullishBeltHold)
+                {
+                    if (ChartControl != null)
+                    {
+                        BarColorSeries.Set(CurrentBar - 1, downColor);
+                        BarColor = upColor;
+                        CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                    }
+
+                    DrawText("Bullish Belt Hold" + CurrentBar, false, "Bullish Belt Hold", 0, Low[0], -10, txtColor,
+                        textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
 
 
-            if (candleStickDeterminer.IsBasicDoji)
+                if (candleStickDeterminer.IsBullishEngulfing)
+                {
+                    if (ChartControl != null)
+                    {
+                        BarColor = upColor;
+                        CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                    }
+
+                    DrawText("Bullish Engulfing" + CurrentBar, false, "Bullish Engulfing", 0, Low[0], -10, txtColor,
+                        textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsBullishHarami)
+                {
+                    if (ChartControl != null)
+                    {
+                        BarColor = upColor;
+                        CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                    }
+
+                    DrawText("Bullish Harami" + CurrentBar, false, "Bullish Harami", 0, Low[0], -10, txtColor,
+                        textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsBullishHaramiCross)
+                {
+                    if (ChartControl != null)
+                    {
+                        BarColor = upColor;
+                        CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                    }
+
+                    DrawText("Bullish Harami Cross" + CurrentBar, false, "Bullish Harami Cross", 0, Low[0], -10,
+                        txtColor, textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsDarkCloudCover)
+                {
+                    if (ChartControl != null)
+                    {
+                        CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
+                        BarColorSeries.Set(CurrentBar - 1, upColor);
+                        BarColor = downColor;
+                    }
+
+                    DrawText("Dark Cloud Cover" + CurrentBar, false, "Dark Cloud Cover", 1, High[0], 10, txtColor,
+                        textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+
+
+                /*
+            if (candleStickDeterminer.IsDoji)
             {
                 if (ChartControl != null)
                 {
@@ -234,352 +236,374 @@ namespace NinjaTrader.Indicator
 
                 patternsFound++;
                 Value.Set(1);
-            }
+            } */
 
-
-            if (candleStickDeterminer.IsDownsideTasukiGap)
-            {
-                if (ChartControl != null)
+                if (candleStickDeterminer.IsBullishConfirmedDoji)
                 {
-                    BarColor = upColor;
-                    CandleOutlineColorSeries.Set(CurrentBar, downColor);
-                    BarColorSeries.Set(CurrentBar - 1, downColor);
-                    BarColorSeries.Set(CurrentBar - 2, downColor);
-                }
-
-                DrawText("Downside Tasuki Gap" + CurrentBar, false, "Downside Tasuki Gap", 1, High[2], 10,
-                    txtColor, textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsEveningStar)
-            {
-                if (ChartControl != null)
-                {
-                    if (Close[0] > Open[0])
+                    if (ChartControl != null)
                     {
                         BarColor = upColor;
                         CandleOutlineColorSeries.Set(CurrentBar, downColor);
                     }
-                    else
+
+                    var yOffset = Close[0] > Close[Math.Min(1, CurrentBar)] ? 10 : -10;
+                    DrawText("Confirmed Doji Text" + CurrentBar, false, "Bullish Doji", 0,
+                        (yOffset > 0 ? High[0] : Low[0]), yOffset,
+                        txtColor, textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(Kp.BullishDoji.ToInt());
+                }
+
+
+                if (candleStickDeterminer.IsDownsideTasukiGap)
+                {
+                    if (ChartControl != null)
+                    {
+                        BarColor = upColor;
+                        CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                        BarColorSeries.Set(CurrentBar - 1, downColor);
+                        BarColorSeries.Set(CurrentBar - 2, downColor);
+                    }
+
+                    DrawText("Downside Tasuki Gap" + CurrentBar, false, "Downside Tasuki Gap", 1, High[2], 10,
+                        txtColor, textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(Kp.BearishDownsideTasukiGap.ToInt());
+                }
+
+
+                if (candleStickDeterminer.IsEveningStar)
+                {
+                    if (ChartControl != null)
+                    {
+                        if (Close[0] > Open[0])
+                        {
+                            BarColor = upColor;
+                            CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                        }
+                        else
+                            BarColor = downColor;
+
+                        if (Close[1] > Open[1])
+                        {
+                            BarColorSeries.Set(CurrentBar - 1, upColor);
+                            CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
+                        }
+                        else
+                            BarColorSeries.Set(CurrentBar - 1, downColor);
+
+                        if (Close[2] > Open[2])
+                        {
+                            BarColorSeries.Set(CurrentBar - 2, upColor);
+                            CandleOutlineColorSeries.Set(CurrentBar - 2, downColor);
+                        }
+                        else
+                            BarColorSeries.Set(CurrentBar - 2, downColor);
+                    }
+
+                    DrawText("Evening Star Text" + CurrentBar, false, "Evening Star", 1, High[1], 10, txtColor,
+                        textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsFallingThree)
+                {
+                    if (ChartControl != null)
+                    {
+                        BarColor = downColor;
+                        BarColorSeries.Set(CurrentBar - 4, downColor);
+
+                        var x = 1;
+                        while (x < 4)
+                        {
+                            if (Close[x] > Open[x])
+                            {
+                                BarColorSeries.Set(CurrentBar - x, upColor);
+                                CandleOutlineColorSeries.Set(CurrentBar - x, downColor);
+                            }
+                            else
+                                BarColorSeries.Set(CurrentBar - x, downColor);
+                            x++;
+                        }
+                    }
+
+                    DrawText("Falling Three Methods" + CurrentBar, false, "Falling Three Methods", 2,
+                        Math.Max(High[0], High[4]), 10, txtColor, textFont, StringAlignment.Center,
+                        Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsHammer)
+                {
+                    if (ChartControl != null)
+                    {
+                        if (Close[0] > Open[0])
+                        {
+                            BarColor = upColor;
+                            CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                        }
+                        else
+                            BarColor = downColor;
+                    }
+
+                    DrawText("Hammer" + CurrentBar, false, "Hammer", 0, Low[0], -10, txtColor, textFont,
+                        StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsHangingMan)
+                {
+                    if (ChartControl != null)
+                    {
+                        if (Close[0] > Open[0])
+                        {
+                            BarColor = upColor;
+                            CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                        }
+                        else
+                            BarColor = downColor;
+                    }
+
+                    DrawText("Hanging Man" + CurrentBar, false, "Hanging Man", 0, Low[0], -10, txtColor, textFont,
+                        StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsInvertedHammer)
+                {
+                    if (ChartControl != null)
+                    {
+                        if (Close[0] > Open[0])
+                        {
+                            BarColor = upColor;
+                            CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                        }
+                        else
+                            BarColor = downColor;
+                    }
+
+                    DrawText("Inverted Hammer" + CurrentBar, false, "InvertedHammer", 0, High[0] + 5*TickSize, 0,
+                        txtColor, textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsMorningStar)
+                {
+                    if (ChartControl != null)
+                    {
+                        if (Close[0] > Open[0])
+                        {
+                            BarColor = upColor;
+                            CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                        }
+                        else
+                            BarColor = downColor;
+
+                        if (Close[1] > Open[1])
+                        {
+                            BarColorSeries.Set(CurrentBar - 1, upColor);
+                            CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
+                        }
+                        else
+                            BarColorSeries.Set(CurrentBar - 1, downColor);
+
+                        if (Close[2] > Open[2])
+                        {
+                            BarColorSeries.Set(CurrentBar - 2, upColor);
+                            CandleOutlineColorSeries.Set(CurrentBar - 2, downColor);
+                        }
+                        else
+                            BarColorSeries.Set(CurrentBar - 2, downColor);
+                    }
+
+                    DrawText("Morning Star Text" + CurrentBar, false, "Morning Star", 1, Low[1], -10, txtColor,
+                        textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsPiercingLine)
+                {
+                    if (ChartControl != null)
+                    {
+                        CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
+                        BarColorSeries.Set(CurrentBar - 1, upColor);
+                        BarColor = downColor;
+                    }
+
+                    DrawText("Piercing Line" + CurrentBar, false, "Piercing Line", 1, Low[0], -10, txtColor,
+                        textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsRisingThree)
+                {
+                    if (ChartControl != null)
+                    {
+                        BarColor = upColor;
+                        CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                        BarColorSeries.Set(CurrentBar - 4, upColor);
+                        CandleOutlineColorSeries.Set(CurrentBar - 4, downColor);
+
+                        var x = 1;
+                        while (x < 4)
+                        {
+                            if (Close[x] > Open[x])
+                            {
+                                BarColorSeries.Set(CurrentBar - x, upColor);
+                                CandleOutlineColorSeries.Set(CurrentBar - x, downColor);
+                            }
+                            else
+                                BarColorSeries.Set(CurrentBar - x, downColor);
+                            x++;
+                        }
+                    }
+
+                    DrawText("Rising Three Methods" + CurrentBar, false, "Rising Three Methods", 2,
+                        Math.Min(Low[0], Low[4]), -10, txtColor, textFont, StringAlignment.Center, Color.Transparent,
+                        Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsShootingStar)
+                {
+                    if (ChartControl != null)
                         BarColor = downColor;
 
-                    if (Close[1] > Open[1])
+                    DrawText("Shooting Star" + CurrentBar, false, "Shooting Star", 0, Low[0], -10, txtColor,
+                        textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsStickSandwich)
+                {
+                    if (ChartControl != null)
                     {
+                        BarColor = downColor;
                         BarColorSeries.Set(CurrentBar - 1, upColor);
                         CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
+                        BarColorSeries.Set(CurrentBar - 2, downColor);
                     }
-                    else
-                        BarColorSeries.Set(CurrentBar - 1, downColor);
 
-                    if (Close[2] > Open[2])
+                    DrawText("Stick Sandwich" + CurrentBar, false, "Stick Sandwich", 1,
+                        Math.Min(Low[0], Math.Min(Low[1], Low[2])), -10, txtColor, textFont, StringAlignment.Center,
+                        Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsThreeBlackCrows)
+                {
+                    if (ChartControl != null)
                     {
+                        BarColor = downColor;
+                        BarColorSeries.Set(CurrentBar - 1, downColor);
+                        BarColorSeries.Set(CurrentBar - 2, downColor);
+                    }
+
+                    DrawText("Three Black Crows" + CurrentBar, false, "Three Black Crows", 1, High[2], 10, txtColor,
+                        textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
+                }
+
+
+                if (candleStickDeterminer.IsThreeWhiteSoldiers)
+                {
+                    if (ChartControl != null)
+                    {
+                        BarColor = upColor;
+                        CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                        BarColorSeries.Set(CurrentBar - 1, upColor);
+                        CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
                         BarColorSeries.Set(CurrentBar - 2, upColor);
                         CandleOutlineColorSeries.Set(CurrentBar - 2, downColor);
                     }
-                    else
-                        BarColorSeries.Set(CurrentBar - 2, downColor);
+
+                    DrawText("Three White Soldiers" + CurrentBar, false, "Three White Soldiers", 1, Low[2], -10,
+                        txtColor, textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
                 }
 
-                DrawText("Evening Star Text" + CurrentBar, false, "Evening Star", 1, High[1], 10, txtColor,
-                    textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
 
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsFallingThree)
-            {
-                if (ChartControl != null)
+                if (candleStickDeterminer.IsUpsideGapTwoCrows)
                 {
-                    BarColor = downColor;
-                    BarColorSeries.Set(CurrentBar - 4, downColor);
-
-                    var x = 1;
-                    while (x < 4)
+                    if (ChartControl != null)
                     {
-                        if (Close[x] > Open[x])
-                        {
-                            BarColorSeries.Set(CurrentBar - x, upColor);
-                            CandleOutlineColorSeries.Set(CurrentBar - x, downColor);
-                        }
-                        else
-                            BarColorSeries.Set(CurrentBar - x, downColor);
-                        x++;
-                    }
-                }
-
-                DrawText("Falling Three Methods" + CurrentBar, false, "Falling Three Methods", 2,
-                    Math.Max(High[0], High[4]), 10, txtColor, textFont, StringAlignment.Center,
-                    Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsHammer)
-            {
-                if (ChartControl != null)
-                {
-                    if (Close[0] > Open[0])
-                    {
-                        BarColor = upColor;
-                        CandleOutlineColorSeries.Set(CurrentBar, downColor);
-                    }
-                    else
                         BarColor = downColor;
-                }
-
-                DrawText("Hammer" + CurrentBar, false, "Hammer", 0, Low[0], -10, txtColor, textFont,
-                    StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsHangingMan)
-            {
-                if (ChartControl != null)
-                {
-                    if (Close[0] > Open[0])
-                    {
-                        BarColor = upColor;
-                        CandleOutlineColorSeries.Set(CurrentBar, downColor);
-                    }
-                    else
-                        BarColor = downColor;
-                }
-
-                DrawText("Hanging Man" + CurrentBar, false, "Hanging Man", 0, Low[0], -10, txtColor, textFont,
-                    StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsInvertedHammer)
-            {
-                if (ChartControl != null)
-                {
-                    if (Close[0] > Open[0])
-                    {
-                        BarColor = upColor;
-                        CandleOutlineColorSeries.Set(CurrentBar, downColor);
-                    }
-                    else
-                        BarColor = downColor;
-                }
-
-                DrawText("Inverted Hammer" + CurrentBar, false, "InvertedHammer", 0, High[0] + 5*TickSize, 0,
-                    txtColor, textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsMorningStar)
-            {
-                if (ChartControl != null)
-                {
-                    if (Close[0] > Open[0])
-                    {
-                        BarColor = upColor;
-                        CandleOutlineColorSeries.Set(CurrentBar, downColor);
-                    }
-                    else
-                        BarColor = downColor;
-
-                    if (Close[1] > Open[1])
-                    {
-                        BarColorSeries.Set(CurrentBar - 1, upColor);
-                        CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
-                    }
-                    else
                         BarColorSeries.Set(CurrentBar - 1, downColor);
-
-                    if (Close[2] > Open[2])
-                    {
                         BarColorSeries.Set(CurrentBar - 2, upColor);
                         CandleOutlineColorSeries.Set(CurrentBar - 2, downColor);
                     }
-                    else
-                        BarColorSeries.Set(CurrentBar - 2, downColor);
+
+                    DrawText("Upside Gap Two Crows" + CurrentBar, false, "Upside Gap Two Crows", 1,
+                        Math.Max(High[0], High[1]), 10, txtColor, textFont, StringAlignment.Center,
+                        Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
                 }
 
-                DrawText("Morning Star Text" + CurrentBar, false, "Morning Star", 1, Low[1], -10, txtColor,
-                    textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
 
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsPiercingLine)
-            {
-                if (ChartControl != null)
+                if (candleStickDeterminer.IsUpsideTasukiGap)
                 {
-                    CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
-                    BarColorSeries.Set(CurrentBar - 1, upColor);
-                    BarColor = downColor;
-                }
-
-                DrawText("Piercing Line" + CurrentBar, false, "Piercing Line", 1, Low[0], -10, txtColor,
-                    textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsRisingThree)
-            {
-                if (ChartControl != null)
-                {
-                    BarColor = upColor;
-                    CandleOutlineColorSeries.Set(CurrentBar, downColor);
-                    BarColorSeries.Set(CurrentBar - 4, upColor);
-                    CandleOutlineColorSeries.Set(CurrentBar - 4, downColor);
-
-                    var x = 1;
-                    while (x < 4)
+                    if (ChartControl != null)
                     {
-                        if (Close[x] > Open[x])
-                        {
-                            BarColorSeries.Set(CurrentBar - x, upColor);
-                            CandleOutlineColorSeries.Set(CurrentBar - x, downColor);
-                        }
-                        else
-                            BarColorSeries.Set(CurrentBar - x, downColor);
-                        x++;
+                        BarColor = downColor;
+                        BarColorSeries.Set(CurrentBar - 1, upColor);
+                        CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
+                        BarColorSeries.Set(CurrentBar - 2, upColor);
+                        CandleOutlineColorSeries.Set(CurrentBar - 2, downColor);
                     }
+
+                    DrawText("Upside Tasuki Gap" + CurrentBar, false, "Upside Tasuki Gap", 1,
+                        Math.Max(High[0], High[1]), 10, txtColor, textFont, StringAlignment.Center,
+                        Color.Transparent, Color.Transparent, 0);
+
+                    patternsFound++;
+                    Value.Set(1);
                 }
 
-                DrawText("Rising Three Methods" + CurrentBar, false, "Rising Three Methods", 2,
-                    Math.Min(Low[0], Low[4]), -10, txtColor, textFont, StringAlignment.Center, Color.Transparent,
-                    Color.Transparent, 0);
 
-                patternsFound++;
-                Value.Set(1);
+                DrawTextFixed("Count", patternsFound + " patterns found", TextPosition.BottomRight);
             }
-
-
-            if (candleStickDeterminer.IsShootingStar)
+            catch (Exception e)
             {
-                if (ChartControl != null)
-                    BarColor = downColor;
-
-                DrawText("Shooting Star" + CurrentBar, false, "Shooting Star", 0, Low[0], -10, txtColor,
-                    textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
+                Print("error found:" + e.Message + " " + e.Source + " " + e.StackTrace);
             }
-
-
-            if (candleStickDeterminer.IsStickSandwich)
-            {
-                if (ChartControl != null)
-                {
-                    BarColor = downColor;
-                    BarColorSeries.Set(CurrentBar - 1, upColor);
-                    CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
-                    BarColorSeries.Set(CurrentBar - 2, downColor);
-                }
-
-                DrawText("Stick Sandwich" + CurrentBar, false, "Stick Sandwich", 1,
-                    Math.Min(Low[0], Math.Min(Low[1], Low[2])), -10, txtColor, textFont, StringAlignment.Center,
-                    Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsThreeBlackCrows)
-            {
-                if (ChartControl != null)
-                {
-                    BarColor = downColor;
-                    BarColorSeries.Set(CurrentBar - 1, downColor);
-                    BarColorSeries.Set(CurrentBar - 2, downColor);
-                }
-
-                DrawText("Three Black Crows" + CurrentBar, false, "Three Black Crows", 1, High[2], 10, txtColor,
-                    textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsThreeWhiteSoldiers)
-            {
-                if (ChartControl != null)
-                {
-                    BarColor = upColor;
-                    CandleOutlineColorSeries.Set(CurrentBar, downColor);
-                    BarColorSeries.Set(CurrentBar - 1, upColor);
-                    CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
-                    BarColorSeries.Set(CurrentBar - 2, upColor);
-                    CandleOutlineColorSeries.Set(CurrentBar - 2, downColor);
-                }
-
-                DrawText("Three White Soldiers" + CurrentBar, false, "Three White Soldiers", 1, Low[2], -10,
-                    txtColor, textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsUpsideGapTwoCrows)
-            {
-                if (ChartControl != null)
-                {
-                    BarColor = downColor;
-                    BarColorSeries.Set(CurrentBar - 1, downColor);
-                    BarColorSeries.Set(CurrentBar - 2, upColor);
-                    CandleOutlineColorSeries.Set(CurrentBar - 2, downColor);
-                }
-
-                DrawText("Upside Gap Two Crows" + CurrentBar, false, "Upside Gap Two Crows", 1,
-                    Math.Max(High[0], High[1]), 10, txtColor, textFont, StringAlignment.Center,
-                    Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            if (candleStickDeterminer.IsUpsideTasukiGap)
-            {
-                if (ChartControl != null)
-                {
-                    BarColor = downColor;
-                    BarColorSeries.Set(CurrentBar - 1, upColor);
-                    CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
-                    BarColorSeries.Set(CurrentBar - 2, upColor);
-                    CandleOutlineColorSeries.Set(CurrentBar - 2, downColor);
-                }
-
-                DrawText("Upside Tasuki Gap" + CurrentBar, false, "Upside Tasuki Gap", 1,
-                    Math.Max(High[0], High[1]), 10, txtColor, textFont, StringAlignment.Center,
-                    Color.Transparent, Color.Transparent, 0);
-
-                patternsFound++;
-                Value.Set(1);
-            }
-
-
-            DrawTextFixed("Count", patternsFound + " patterns found", TextPosition.BottomRight);
         }
 
 

@@ -24,7 +24,7 @@ namespace NinjaTrader.Custom.Strategy
 			public DateTime DtTm {get;set;}
 			public DateTime Dt {get;set;}
 			public int Hr {get; set;}
-			public double VolumeSMA3 {get; set;}
+            public double CandleStick { get; set; }
 				
 		}
 			
@@ -66,7 +66,7 @@ namespace NinjaTrader.Custom.Strategy
         /// </summary>
         protected override void OnBarUpdate()
         {
-          
+
 
 			var myRow = new DataItem{
 				High = High[0],
@@ -77,11 +77,11 @@ namespace NinjaTrader.Custom.Strategy
 				DtTm = Time[0],
 				Dt = Time[0].Date,
 				Hr = Time[0].Hour,
-				VolumeSMA3 = SMA(Volume, 3)[0]
+                CandleStick = this.KenCandleStickPattern(8)[0]
 			};
 			
 			try{
-			DbConn.Execute("insert into dbo.extractedData([High], [Low], [Open], [Close], [Volume], Dt, DtTm, Hr,  VolumeSMA3) select @High, @Low, @Open, @Close, @Volume, @Dt, @DtTm, @Hr, @VolumeSMA3", myRow);
+			DbConn.Execute("insert into dbo.extractedData([High], [Low], [Open], [Close], Dt, DtTm, Hr,  CandleStick) select @High, @Low, @Open, @Close, @Dt, @DtTm, @Hr, @CandleStick", myRow);
 			}catch (Exception ex){
 				Print("Fail " + ex.Message);
 			}
