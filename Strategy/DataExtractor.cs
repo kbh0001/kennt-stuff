@@ -67,7 +67,22 @@ namespace NinjaTrader.Custom.Strategy
         /// </summary>
         protected override void OnBarUpdate()
         {
+            
+            var list = new[] { Kp.BullishHammer, Kp.BearishShootingStar, Kp.BullishHaramiCross, Kp.BearishHarami, Kp.BullishHarami, Kp.BullishDoji,  };
 
+            double candleStick = 0;
+
+            foreach (var dood in list)
+            {
+                if ((candleStick = this.KenCandleStickPattern(dood, 4)[0]) != 0)
+                {
+                    break;
+
+                }
+            }
+
+            
+            
 
 			var myRow = new DataItem{
 				High = High[0],
@@ -78,7 +93,7 @@ namespace NinjaTrader.Custom.Strategy
 				DtTm = Time[0],
 				Dt = Time[0].Date,
 				Hr = Time[0].Hour,
-                CandleStick = this.KenCandleStickPattern(Kp.All, 8)[0]
+                CandleStick = candleStick
 			};
 			
 			try{

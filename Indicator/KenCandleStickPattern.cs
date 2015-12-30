@@ -285,6 +285,29 @@ namespace NinjaTrader.Indicator
                 }
 
 
+                if (allowedPatterns.Contains(Kp.BearishDoji))
+                {
+
+                    
+                    if (candleStickDeterminer.IsBearishDoji)
+                    {
+                        if (ChartControl != null)
+                        {
+                            BarColor = upColor;
+                            CandleOutlineColorSeries.Set(CurrentBar, downColor);
+                        }
+
+                        var yOffset = Close[0] > Close[Math.Min(1, CurrentBar)] ? 10 : -10;
+                        DrawText("Confirmed Doji Text" + CurrentBar, false, "Bearish Doji", 0,
+                            (yOffset > 0 ? High[0] : Low[0]), yOffset,
+                            txtColor, textFont, StringAlignment.Center, Color.Transparent, Color.Transparent, 0);
+
+                        patternsFound++;
+                        Value.Set(Kp.BearishDoji.ToInt());
+                    }
+                }
+
+
                 if (allowedPatterns.Contains(Kp.BearishDownsideTasukiGap))
                 {
                     if (candleStickDeterminer.IsDownsideTasukiGap)
