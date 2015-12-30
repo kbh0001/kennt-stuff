@@ -87,12 +87,9 @@ namespace NinjaTrader.Indicator
 
                 if (CurrentBar == 0 && ChartControl != null)
                 {
-                    downColor = ChartControl.GetAxisBrush(ChartControl.BackColor).Color;
-                    txtColor = downColor;
-                    if (downColor == Color.Black)
-                        upColor = Color.Transparent;
-                    else
-                        upColor = Color.Black;
+                    downColor = Color.White;
+                    txtColor = Color.Black;
+                    upColor = Color.Black;
                 }
                 Value.Set(0);
 
@@ -556,23 +553,44 @@ namespace NinjaTrader.Indicator
                     }
                 }
 
-
-                if (candleStickDeterminer.IsStickSandwich)
+                if (allowedPatterns.Contains(Kp.BearishStickSandwich))
                 {
-                    if (ChartControl != null)
+                    if (candleStickDeterminer.IsBearishStickSandwich)
                     {
-                        BarColor = downColor;
-                        BarColorSeries.Set(CurrentBar - 1, upColor);
-                        CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
-                        BarColorSeries.Set(CurrentBar - 2, downColor);
+                        if (ChartControl != null)
+                        {
+                            BarColor = downColor;
+                            BarColorSeries.Set(CurrentBar - 1, upColor);
+                            BarColorSeries.Set(CurrentBar - 2, downColor);
+                        }
+
+                        DrawText("Stick Sandwich" + CurrentBar, false, "Stick Sandwich", 1,
+                            Math.Min(Low[0], Math.Min(Low[1], Low[2])), -10, txtColor, textFont, StringAlignment.Center,
+                            Color.Transparent, Color.Transparent, 0);
+
+                        patternsFound++;
+                        Value.Set(Kp.BearishStickSandwich.ToInt());
                     }
+                }
 
-                    DrawText("Stick Sandwich" + CurrentBar, false, "Stick Sandwich", 1,
-                        Math.Min(Low[0], Math.Min(Low[1], Low[2])), -10, txtColor, textFont, StringAlignment.Center,
-                        Color.Transparent, Color.Transparent, 0);
+                if (allowedPatterns.Contains(Kp.BullishStickSandwich))
+                {
+                    if (candleStickDeterminer.IsBullishStickSandwich)
+                    {
+                        if (ChartControl != null)
+                        {
+                            BarColor = upColor;
+                            BarColorSeries.Set(CurrentBar - 1, downColor);
+                            BarColorSeries.Set(CurrentBar - 2, upColor);
+                        }
 
-                    patternsFound++;
-                    Value.Set(1);
+                        DrawText("Stick Sandwich" + CurrentBar, false, "Stick Sandwich", 1,
+                            Math.Min(Low[0], Math.Min(Low[1], Low[2])), -10, txtColor, textFont, StringAlignment.Center,
+                            Color.Transparent, Color.Transparent, 0);
+
+                        patternsFound++;
+                        Value.Set(Kp.BullishStickSandwich.ToInt());
+                    }
                 }
 
                 if (allowedPatterns.Contains(Kp.BearishThreeBlackCrows))
