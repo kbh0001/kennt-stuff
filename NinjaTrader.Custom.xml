@@ -6954,6 +6954,11 @@
             Called on each bar update event (incoming tick)
             </summary>
         </member>
+        <member name="T:NinjaTrader.Custom.Strategy.KenCandleStickStrategy">
+            <summary>
+            Get Some Data
+            </summary>
+        </member>
         <member name="T:NinjaTrader.Data.DayBarsType">
             <summary>
             </summary>
