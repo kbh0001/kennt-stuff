@@ -706,6 +706,33 @@ namespace NinjaTrader.Indicator
                 }
 
 
+                if (allowedPatterns.Contains(Kp.BullishBottomBounce))
+                {
+
+                    if (candleStickDeterminer.IsBottomBounce)
+                    {
+                        if (ChartControl != null)
+                        {
+                            /*
+                            BarColor = downColor;
+                            BarColorSeries.Set(CurrentBar - 1, upColor);
+                            CandleOutlineColorSeries.Set(CurrentBar - 1, downColor);
+                            BarColorSeries.Set(CurrentBar - 2, upColor);
+                            CandleOutlineColorSeries.Set(CurrentBar - 2, downColor);
+                            */
+                        }
+
+                        DrawText("Bottom Bounce" + CurrentBar, false, "Bottom Bounce", 1,
+                            Math.Max(High[0], High[1]), 10, txtColor, textFont, StringAlignment.Center,
+                            Color.Transparent, Color.Transparent, 0);
+
+                        patternsFound++;
+                        Value.Set(Kp.BullishBottomBounce.ToInt());
+                    }
+
+                }
+
+
                 DrawTextFixed("Count", patternsFound + " patterns found", TextPosition.BottomRight);
             }
             catch (Exception e)

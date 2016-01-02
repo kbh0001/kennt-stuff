@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using KenNinja;
+using NinjaTrader.Strategy;
 
 namespace NinjaTrader.Custom.Strategy
 {
@@ -20,15 +21,19 @@ namespace NinjaTrader.Custom.Strategy
         private static readonly List<Kp> KpsToUse;
         private static int tradeId = 0;
         protected IDbConnection DbConn;
-        private SortedList<System.Guid, ActiveOrder> activerOrders;
-        private int myInput0 = 1; // Default setting for MyInput0
+        private int _bears;
         private int _bulls;
+        private int _winningBears;
         private int _winningBulls;
+        private SortedList<Guid, ActiveOrder> activerOrders;
+        private int myInput0 = 1; // Default setting for MyInput0
+        private bool _isSignalSent;
 
 
         //Configure the allowed patterns that are significant order by performance.
         static KenCandleStickStrategy()
         {
+			
             var list = new[]
             {
                 109,
@@ -42,8 +47,13 @@ namespace NinjaTrader.Custom.Strategy
                 -112,
                 -104,
                 -103,
-                104
+                104, 
+                112
             };
+			
+			
+			
+           
             var validValues = Enum.GetValues(typeof (Kp)).Cast<Kp>().Select(z => z.ToInt());
             KpsToUse = list.Where(validValues.Contains).Cast<Kp>().ToList();
         }
@@ -53,16 +63,22 @@ namespace NinjaTrader.Custom.Strategy
         {
             ClearOutputWindow();
             CalculateOnBarClose = true; // only on bar close( this is a candle stick strategy)
-            activerOrders = new SortedList<System.Guid, ActiveOrder>();
+            activerOrders = new SortedList<Guid, ActiveOrder>();
             _bulls = 0;
             _winningBulls = 0;
+            _bears = 0;
+            _winningBears = 0;
+  
+
         }
 
 
         protected override void OnBarUpdate()
         {
             HandleCurrentOrders();
-            Print(string.Format("{0} of {1} bulls successful", _winningBulls, _bulls));
+            //Print(string.Format("{0} of {1} bulls successful", _winningBulls, _bulls));
+            //Print(string.Format("{0} of {1} bears successful", _winningBears, _bears));
+            //Print(string.Format("{0} of {1} all successful", _winningBears + _winningBulls, _bears + _bulls));
 
 
             double candlestick = 0;
@@ -100,16 +116,43 @@ namespace NinjaTrader.Custom.Strategy
                 };
 
 
+            //if (activerOrders.Any())
+            //   return;
+
             if (IsBullishSentiment(candlestick))
             {
                 order.IsLong = true;
-                order.ExitAt = Close[0] + .02;
+                order.ExitAt = Close[0] + .0004;
                 activerOrders.Add(order.Id, order);
+
+               
                 _bulls++;
+
+                SendNotification(candlestick);
             }
 
             if (IsBearishSentiment(candlestick))
             {
+                order.IsLong = false;
+                order.ExitAt = Close[0] - .0004;
+                activerOrders.Add(order.Id, order);
+                _bears++;
+
+                SendNotification(candlestick);
+            }
+        }
+
+        private void SendNotification(double candlestick)
+        {
+
+            if (!_isSignalSent)
+            {
+                _isSignalSent = true;
+                var isBull = IsBullishSentiment(candlestick);
+                var mailSubject = string.Format("KC-SIGNAL-{0}: {1} on {2} @ {3}", (isBull) ? "BULL" : "BEAR", (Kp)candlestick, this.Instrument, this.Close[0]);
+                var mailContentTemplate = @"A {0} {4} signal was observed in '{1}' at {2} at a closing price of {3}.";
+                var mailContent = string.Format(mailContentTemplate, (isBull) ? "BULL" : "BEAR", this.Instrument, this.Time, this.Close[0], (Kp)candlestick);
+                SendMail("hoskinsken@gmail.com", "hoskinsken@gmail.com", mailSubject, mailSubject);
             }
         }
 
@@ -119,12 +162,20 @@ namespace NinjaTrader.Custom.Strategy
             {
                 var currentNow = DateTime.Parse(Time.ToString());
 
-                var successfulBulls = activerOrders.Values.Where(z => z.IsLong && this.High[0] > z.ExitAt).ToList();
+                var successfulBulls = activerOrders.Values.Where(z => z.IsLong && High[0] > z.ExitAt).ToList();
                 foreach (var success in successfulBulls)
                 {
                     activerOrders.Remove(success.Id);
                     _winningBulls++;
 
+                }
+
+
+                var successfulBears = activerOrders.Values.Where(z => !z.IsLong && Low[0] < z.ExitAt).ToList();
+                foreach (var success in successfulBears)
+                {
+                    activerOrders.Remove(success.Id);
+                    _winningBears++;
                 }
 
                 if (currentNow.Minute == 45)
@@ -135,9 +186,13 @@ namespace NinjaTrader.Custom.Strategy
 
                     foreach (var candidate in closingOrders)
                     {
-                        if (candidate.EnteredAt < this.Close[0])
+                        if (candidate.IsLong && candidate.EnteredAt < Close[0])
                         {
                             _winningBulls++;
+                        }
+                        if (!candidate.IsLong && candidate.EnteredAt > Close[0])
+                        {
+                            _winningBears++;
                         }
                         activerOrders.Remove(candidate.Id);
                     }
