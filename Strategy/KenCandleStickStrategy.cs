@@ -6,7 +6,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using KenNinja;
-using NinjaTrader.Strategy;
 
 namespace NinjaTrader.Custom.Strategy
 {
@@ -27,13 +26,11 @@ namespace NinjaTrader.Custom.Strategy
         private int _winningBulls;
         private SortedList<Guid, ActiveOrder> activerOrders;
         private int myInput0 = 1; // Default setting for MyInput0
-        private bool _isSignalSent;
 
 
         //Configure the allowed patterns that are significant order by performance.
         static KenCandleStickStrategy()
         {
-			
             var list = new[]
             {
                 109,
@@ -47,13 +44,11 @@ namespace NinjaTrader.Custom.Strategy
                 -112,
                 -104,
                 -103,
-                104, 
+                104,
                 112
             };
-			
-			
-			
-           
+
+
             var validValues = Enum.GetValues(typeof (Kp)).Cast<Kp>().Select(z => z.ToInt());
             KpsToUse = list.Where(validValues.Contains).Cast<Kp>().ToList();
         }
@@ -68,17 +63,15 @@ namespace NinjaTrader.Custom.Strategy
             _winningBulls = 0;
             _bears = 0;
             _winningBears = 0;
-  
-
         }
 
 
         protected override void OnBarUpdate()
         {
             HandleCurrentOrders();
-            //Print(string.Format("{0} of {1} bulls successful", _winningBulls, _bulls));
-            //Print(string.Format("{0} of {1} bears successful", _winningBears, _bears));
-            //Print(string.Format("{0} of {1} all successful", _winningBears + _winningBulls, _bears + _bulls));
+            Print(string.Format("{0} of {1} bulls successful", _winningBulls, _bulls));
+            Print(string.Format("{0} of {1} bears successful", _winningBears, _bears));
+            Print(string.Format("{0} of {1} all successful", _winningBears + _winningBulls, _bears + _bulls));
 
 
             double candlestick = 0;
@@ -116,16 +109,13 @@ namespace NinjaTrader.Custom.Strategy
                 };
 
 
-            //if (activerOrders.Any())
-            //   return;
-
             if (IsBullishSentiment(candlestick))
             {
                 order.IsLong = true;
                 order.ExitAt = Close[0] + .0004;
                 activerOrders.Add(order.Id, order);
 
-               
+
                 _bulls++;
 
                 SendNotification(candlestick);
@@ -144,16 +134,14 @@ namespace NinjaTrader.Custom.Strategy
 
         private void SendNotification(double candlestick)
         {
-
-            if (!_isSignalSent)
-            {
-                _isSignalSent = true;
-                var isBull = IsBullishSentiment(candlestick);
-                var mailSubject = string.Format("KC-SIGNAL-{0}: {1} on {2} @ {3}", (isBull) ? "BULL" : "BEAR", (Kp)candlestick, this.Instrument, this.Close[0]);
-                var mailContentTemplate = @"A {0} {4} signal was observed in '{1}' at {2} at a closing price of {3}.";
-                var mailContent = string.Format(mailContentTemplate, (isBull) ? "BULL" : "BEAR", this.Instrument, this.Time, this.Close[0], (Kp)candlestick);
-                SendMail("hoskinsken@gmail.com", "hoskinsken@gmail.com", mailSubject, mailSubject);
-            }
+       
+            var isBull = IsBullishSentiment(candlestick);
+            var mailSubject = string.Format("KC-SIGNAL-{0}: {1} on {2} @ {3}", (isBull) ? "BULL" : "BEAR",
+                (Kp) candlestick, Instrument, Close[0]);
+            var mailContentTemplate = @"A {0} {4} signal was observed in '{1}' at {2} at a closing price of {3}.";
+            var mailContent = string.Format(mailContentTemplate, (isBull) ? "BULL" : "BEAR", Instrument, Time, Close[0],
+                (Kp) candlestick);
+            SendMail("hoskinsken@gmail.com", "hoskinsken@gmail.com", mailSubject, mailContent);
         }
 
         private void HandleCurrentOrders()
@@ -167,7 +155,6 @@ namespace NinjaTrader.Custom.Strategy
                 {
                     activerOrders.Remove(success.Id);
                     _winningBulls++;
-
                 }
 
 
