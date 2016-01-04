@@ -495,7 +495,7 @@
     <None Include="deploy.bat" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\KenNinja\KenNinja.csproj">
+    <ProjectReference Include="KenNinja\KenNinja.csproj">
       <Project>{bab9e6f8-7ebd-449b-9049-0a6c7be7ee70}</Project>
       <Name>KenNinja</Name>
     </ProjectReference>

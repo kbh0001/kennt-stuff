@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NinjaTrader.Custom", "NinjaTrader.Custom.csproj", "{39F94375-3631-4B74-B40E-F7A678E5B67D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KenNinja", "..\KenNinja\KenNinja.csproj", "{BAB9E6F8-7EBD-449B-9049-0A6C7BE7EE70}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KenNinja", "KenNinja\KenNinja.csproj", "{BAB9E6F8-7EBD-449B-9049-0A6C7BE7EE70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
