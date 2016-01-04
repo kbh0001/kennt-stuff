@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using KenNinja;
+using NinjaTrader.Cbi;
 
 namespace NinjaTrader.Custom.Strategy
 {
@@ -56,6 +57,8 @@ namespace NinjaTrader.Custom.Strategy
 
         protected override void Initialize()
         {
+
+            Log(string.Format("Starting for KenCandleStickStrategy {0}", Instrument), LogLevel.Information);
             ClearOutputWindow();
             CalculateOnBarClose = true; // only on bar close( this is a candle stick strategy)
             activerOrders = new SortedList<Guid, ActiveOrder>();
@@ -63,11 +66,17 @@ namespace NinjaTrader.Custom.Strategy
             _winningBulls = 0;
             _bears = 0;
             _winningBears = 0;
+
+            SendMail("hoskinsken@gmail.com", "hoskinsken@gmail.com", "KC-SIGNAL " + string.Format("Starting for KenCandleStickStrategy {0}", Instrument), "");
         }
 
 
         protected override void OnBarUpdate()
         {
+
+            if (!Historical)
+                Log(string.Format("OnBarUpdate for {0}", Instrument), LogLevel.Information);
+
             HandleCurrentOrders();
             Print(string.Format("{0} of {1} bulls successful", _winningBulls, _bulls));
             Print(string.Format("{0} of {1} bears successful", _winningBears, _bears));
@@ -134,7 +143,11 @@ namespace NinjaTrader.Custom.Strategy
 
         private void SendNotification(double candlestick)
         {
-       
+
+            if (Historical)
+                return;
+
+            
             var isBull = IsBullishSentiment(candlestick);
             var mailSubject = string.Format("KC-SIGNAL-{0}: {1} on {2} @ {3}", (isBull) ? "BULL" : "BEAR",
                 (Kp) candlestick, Instrument, Close[0]);
