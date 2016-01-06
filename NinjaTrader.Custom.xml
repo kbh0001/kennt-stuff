@@ -6959,6 +6959,11 @@
             Get Some Data
             </summary>
         </member>
+        <member name="T:NinjaTrader.Custom.Strategy.StocCross">
+            <summary>
+            Get Some Data
+            </summary>
+        </member>
         <member name="T:NinjaTrader.Data.DayBarsType">
             <summary>
             </summary>

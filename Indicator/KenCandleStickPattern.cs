@@ -72,6 +72,8 @@ namespace NinjaTrader.Indicator
         /// </summary>
         protected override void Initialize()
         {
+            
+
             Add(new Plot(Color.Transparent, "Pattern Found"));
             Overlay = true;
         }
@@ -83,13 +85,18 @@ namespace NinjaTrader.Indicator
         {
             try
             {
-                var candleStickDeterminer = new KenCandleStickDeterminer(this, TrendStrength, Print);
+
+                Func<int, double> stochFunc =
+                (int period) => this.Stochastics(this.trendStrength, this.trendStrength * 2, 3)[period];
+
+
+                var candleStickDeterminer = new KenCandleStickDeterminer(this, TrendStrength, stochFunc, Print);
 
                 if (CurrentBar == 0 && ChartControl != null)
                 {
-                    downColor = Color.White;
+                    downColor = Color.Brown;
                     txtColor = Color.Black;
-                    upColor = Color.Black;
+                    upColor = Color.Blue;
                 }
                 Value.Set(0);
 

@@ -16,7 +16,7 @@ namespace NinjaTrader.Custom.Strategy
     /// Get Some Data
     /// </summary>
     [Description("Get Some Data")]
-    public class KenCandleStickStrategy : NinjaTrader.Strategy.Strategy
+    public class StocCross : NinjaTrader.Strategy.Strategy
     {
         // User defined variables (add any user defined variables below)
 
@@ -27,7 +27,7 @@ namespace NinjaTrader.Custom.Strategy
         private int _bulls;
         private int _winningBears;
         private int _winningBulls;
-        private SortedList<Kp, StatData> _stats; 
+       
 
         private SortedList<Guid, ActiveOrder> activerOrders;
         private int myInput0 = 1; // Default setting for MyInput0
@@ -35,7 +35,7 @@ namespace NinjaTrader.Custom.Strategy
 
 
         //Configure the allowed patterns that are significant order by performance.
-        static KenCandleStickStrategy()
+        static StocCross()
         {
             var list = new[]
             {
@@ -55,11 +55,11 @@ namespace NinjaTrader.Custom.Strategy
             };
 
             list = Enum.GetValues(typeof(Kp)).Cast<Kp>().Select(z => z.ToInt()).ToArray();
-            
 
-          
 
-            var validValues = Enum.GetValues(typeof (Kp)).Cast<Kp>().Select(z => z.ToInt());
+
+
+            var validValues = Enum.GetValues(typeof(Kp)).Cast<Kp>().Select(z => z.ToInt());
             KpsToUse = list.Where(validValues.Contains).Cast<Kp>().ToList();
         }
 
@@ -79,12 +79,12 @@ namespace NinjaTrader.Custom.Strategy
             {
                 Print("Fail");
             }
-            
 
 
 
 
-            Log(string.Format("Starting for KenCandleStickStrategy {0}", Instrument), LogLevel.Information);
+
+            Log(string.Format("Starting for StocScorr {0}", Instrument), LogLevel.Information);
             ClearOutputWindow();
             CalculateOnBarClose = true; // only on bar close( this is a candle stick strategy)
             activerOrders = new SortedList<Guid, ActiveOrder>();
@@ -93,12 +93,7 @@ namespace NinjaTrader.Custom.Strategy
             _bears = 0;
             _winningBears = 0;
 
-            _stats = new SortedList<Kp, StatData>();
-            foreach (var dood in Enum.GetValues(typeof(Kp)).Cast<Kp>())
-            {
-                _stats.Add(dood, new StatData());
-
-            }
+        
 
 
 
@@ -117,31 +112,28 @@ namespace NinjaTrader.Custom.Strategy
 
 
 
-            foreach (var dood in _stats.Where(z => z.Value.Success > 0).OrderByDescending(z=>z.Value.Success / z.Value.Attempt))
-            {
-                Print(string.Format("{0}: {1} of {2} ({3}) successful", dood.Key, dood.Value.Success, dood.Value.Attempt, (dood.Value.Success/dood.Value.Attempt)));
-            }
-
-
             Print(string.Format("{0} of {1} bulls successful", _winningBulls, _bulls));
             Print(string.Format("{0} of {1} bears successful", _winningBears, _bears));
             Print(string.Format("{0} of {1} all successful", _winningBears + _winningBulls, _bears + _bulls));
 
 
-            
+
             double candlestick = 0;
 
             var barTime = DateTime.Parse(Time.ToString());
 
-     
-        
- 
+
+
+
 
             //Is there any sentiment found
-            foreach (var dood in KpsToUse)
-            {
-                candlestick = KenCandleStickPattern(dood, 8)[0];
-                if (IsBullishSentiment(candlestick) || IsBearishSentiment(candlestick))
+
+            var isBull = CrossAbove(this.Stochastics(7, 14, 3).K, this.Stochastics(7, 14, 3).D, 10) &&
+                         this.Stochastics(7, 14, 3).D[0] < 20;
+            var isBear = false;
+        
+          
+                if (isBull || isBear)
                 {
                     var expiryTime = barTime.AddHours(1);
 
@@ -153,39 +145,40 @@ namespace NinjaTrader.Custom.Strategy
                             ExpiryHour = expiryTime.Hour,
                             ExpiryDay = expiryTime.Day,
                             EnteredAt = Close[0],
-                            Kp = (Kp)(int)candlestick
                         };
 
 
-                    if (IsBullishSentiment(candlestick))
+                     
+                    if (isBull)
                     {
                         order.IsLong = true;
-                        order.ExitAt = Close[0] + (Math.Abs(_strikeWidth) / 4);
+                        order.ExitAt = Close[0] + (Math.Abs(_strikeWidth) / 2);
                         activerOrders.Add(order.Id, order);
                         _bulls++;
-                        _stats[(Kp)(int)candlestick].Attempt = _stats[(Kp)(int)candlestick].Attempt + 1;
 
                         SendNotification(candlestick);
                     }
+                    
+
+                    /*
 
                     if (IsBearishSentiment(candlestick))
                     {
                         order.IsLong = false;
-                        order.ExitAt = Close[0] - (Math.Abs(_strikeWidth) / 4);
+                        order.ExitAt = Close[0] - (Math.Abs(_strikeWidth) / 2);
 
                         activerOrders.Add(order.Id, order);
                         _bears++;
 
-                        _stats[(Kp)(int)candlestick].Attempt = _stats[(Kp)(int)candlestick].Attempt + 1;
 
                         SendNotification(candlestick);
                     }
+                     * */
                 }
-                candlestick = 0;
-            }
-
-
             
+
+
+
         }
 
         private void SendNotification(double candlestick)
@@ -194,13 +187,13 @@ namespace NinjaTrader.Custom.Strategy
             if (Historical)
                 return;
 
-            
+
             var isBull = IsBullishSentiment(candlestick);
             var mailSubject = string.Format("KC-SIGNAL-{0}: {1} on {2} @ {3}", (isBull) ? "BULL" : "BEAR",
-                (Kp) candlestick, Instrument, Close[0]);
+                (Kp)candlestick, Instrument, Close[0]);
             var mailContentTemplate = @"A {0} {4} signal was observed in '{1}' at {2} at a closing price of {3}.";
             var mailContent = string.Format(mailContentTemplate, (isBull) ? "BULL" : "BEAR", Instrument, Time, Close[0],
-                (Kp) candlestick);
+                (Kp)candlestick);
             SendMail("hoskinsken@gmail.com", "hoskinsken@gmail.com", mailSubject, mailContent);
         }
 
@@ -214,7 +207,6 @@ namespace NinjaTrader.Custom.Strategy
                 foreach (var success in successfulBulls)
                 {
 
-                    _stats[success.Kp].Success = _stats[success.Kp].Success + 1;
                     activerOrders.Remove(success.Id);
                     _winningBulls++;
                 }
@@ -223,7 +215,6 @@ namespace NinjaTrader.Custom.Strategy
                 var successfulBears = activerOrders.Values.Where(z => !z.IsLong && Low[0] <= z.ExitAt).ToList();
                 foreach (var success in successfulBears)
                 {
-                    _stats[success.Kp].Success = _stats[success.Kp].Success + 1;
                     activerOrders.Remove(success.Id);
                     _winningBears++;
                 }
@@ -238,12 +229,10 @@ namespace NinjaTrader.Custom.Strategy
                     {
                         if (candidate.IsLong && candidate.EnteredAt < Close[0])
                         {
-                            _stats[candidate.Kp].Success = _stats[candidate.Kp].Success + 1;
                             _winningBulls++;
                         }
                         if (!candidate.IsLong && candidate.EnteredAt > Close[0])
                         {
-                            _stats[candidate.Kp].Success = _stats[candidate.Kp].Success + 1;
                             _winningBears++;
                         }
                         activerOrders.Remove(candidate.Id);
@@ -263,12 +252,6 @@ namespace NinjaTrader.Custom.Strategy
             return candleStick > 99;
         }
 
-        private class StatData
-        {
-            public double Success { get; set; }
-            public double Attempt { get; set; }
-        
-        }
 
         private class ActiveOrder
         {
@@ -279,7 +262,7 @@ namespace NinjaTrader.Custom.Strategy
             public bool IsLong { get; set; }
             public double EnteredAt { get; set; }
             public double ExitAt { get; set; }
-            public Kp Kp { get; set; }
+         
         }
     }
 }

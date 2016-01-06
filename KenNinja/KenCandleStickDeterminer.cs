@@ -13,12 +13,14 @@ namespace KenNinja
 
         private bool isDownTrend;
         private bool isUpTrend;
+        private Func<int, double> _stocFunc;
 
-        public KenCandleStickDeterminer(IndicatorBase indicator, int trendWeight, Action<string> logger = null)
+        public KenCandleStickDeterminer(IndicatorBase indicator, int trendWeight, Func<int, double> stocFunc,  Action<string> logger = null)
         {
             _indicator = indicator;
             _trendWeight = trendWeight;
             _loggerDelegate = logger;
+            _stocFunc = stocFunc;
             CalculateTrendLines();
         }
 
@@ -50,12 +52,14 @@ namespace KenNinja
         {
             get
             {
-                if (_indicator.CurrentBar < 1 || WasBullTrend(1))
+                if (_indicator.CurrentBar < 4)
+
+                if (_stocFunc(0) > 35)
                     return false;
 
 
-                return (_indicator.CurrentBar >= 2 && WasBearTrend(1) && DetermineIsDojiFor(1) &&
-                        _indicator.Close[0] > _indicator.Close[1] && _indicator.Low[1] < _indicator.Close[2]);
+
+                return (DetermineIsDojiFor() && IsBearCandle(1) && IsBearCandle(2) && IsBearCandle(3));
             }
         }
 
@@ -67,10 +71,10 @@ namespace KenNinja
                 if (_indicator.CurrentBar < 1 || WasBearTrend(1))
                     return false;
 
+                if (_stocFunc(1) < 75)
+                    return false;
 
                 return (_indicator.CurrentBar >= 2 && WasBullTrend(1) && DetermineIsDojiFor(1));
-                //    &&
-                // _indicator.Close[0] > _indicator.Close[1] && _indicator.High[1] < _indicator.Close[2]);
             }
         }
 
@@ -141,8 +145,8 @@ namespace KenNinja
                 if (_indicator.CurrentBar < 1 || (IsBullTrend))
                     return false;
 
-                return IsBullCandle(0) && IsBearCandle(1) &&
-                       _indicator.Low[0] >= _indicator.Close[1] && _indicator.High[0] <= _indicator.Open[1];
+                return IsBullCandle() && IsBearCandle(1) &&
+                       _indicator.Low[0] > _indicator.Close[1] && _indicator.High[0] < _indicator.Open[1];
             }
         }
 
@@ -415,11 +419,19 @@ namespace KenNinja
                 if (_indicator.CurrentBar < 1 || (_trendWeight > 0 && !isUpTrend))
                     return false;
 
+                if (_stocFunc(0) < 70)
+                    return false;
 
-                return _indicator.High[0] > _indicator.Open[0] &&
+
+
+                var seemsToBeStar =  _indicator.High[0] > _indicator.Open[0] &&
                        (_indicator.High[0] - _indicator.Open[0]) >= 2*(_indicator.Open[0] - _indicator.Close[0]) &&
                        _indicator.Close[0] < _indicator.Open[0] &&
-                       (_indicator.Close[0] - _indicator.Low[0]) <= 2*_indicator.TickSize;
+                       (_indicator.Close[0] - _indicator.Low[0]) <= 0;
+
+
+                return seemsToBeStar;
+
             }
         }
 
@@ -473,14 +485,19 @@ namespace KenNinja
                 if (!IsBearTrend)
                     return false;
 
-                if (_indicator.CurrentBar < 3)
+                if (_indicator.CurrentBar < 4)
                     return false;
 
-                if (!(IsBearCandle(3) && IsBearCandle(2) && IsBullCandle(1)))
+                if (!(IsBearCandle(3) && IsBearCandle(2) && IsBullCandle(1) && IsBullCandle()))
                     return false;
 
-                if (!HasDepth(3) && !HasDepth(2) || !HasDepth(1))
+                if (!HasDepth(3) || !HasDepth(2) || !HasDepth(1) || !HasDepth())
                     return false;
+
+
+                if (this._stocFunc(2) > 19)
+                    return false;
+
 
 
                 var bounceThreshold = (_indicator.Open[2] + _indicator.Close[2])/2;
