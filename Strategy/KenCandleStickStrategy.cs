@@ -67,7 +67,12 @@ namespace NinjaTrader.Custom.Strategy
         protected override void Initialize()
         {
 
-            var _stikeWidths = new SortedList<string, double> { { "$EURUSD", .01 }, { "$GPDUSD", .015 }, { "$USDJPY", 1.0 }, { "$AUDUSD", .01 }, { "$USDCAD", .01 }, { "$EURJPY", 1.0 } };
+            var _binaryWidths= new SortedList<string, double> { { "$EURUSD", .01 }, { "$GPDUSD", .015 }, { "$USDJPY", .04 }, { "$AUDUSD", .00005 }, { "$USDCAD", .0011 }, { "$EURJPY", .1 } };
+
+            var  _spreadWidths = new SortedList<string, double> { { "$EURUSD", .0004 }, { "$GPDUSD", .001 }, { "$USDJPY", 1.0 }, { "$AUDUSD", .01 }, { "$USDCAD", .01 }, { "$EURJPY", 1.0 } };
+
+
+            var _stikeWidths = _binaryWidths;
             var instrument = this.Instrument.ToString().ToUpper().Replace("DEFAULT", "").Replace(" ", "");
             Print(instrument);
             if (_stikeWidths.ContainsKey(instrument))
@@ -140,48 +145,53 @@ namespace NinjaTrader.Custom.Strategy
             //Is there any sentiment found
             foreach (var dood in KpsToUse)
             {
-                candlestick = KenCandleStickPattern(dood, 8)[0];
-                if (IsBullishSentiment(candlestick) || IsBearishSentiment(candlestick))
-                {
-                    var expiryTime = barTime.AddHours(1);
-
-                    var
-                        order = new ActiveOrder
-                        {
-                            Id = Guid.NewGuid(),
-                            Time = barTime,
-                            ExpiryHour = expiryTime.Hour,
-                            ExpiryDay = expiryTime.Day,
-                            EnteredAt = Close[0],
-                            Kp = (Kp)(int)candlestick
-                        };
-
-
-                    if (IsBullishSentiment(candlestick))
-                    {
-                        order.IsLong = true;
-                        order.ExitAt = Close[0] + (Math.Abs(_strikeWidth) / 4);
-                        activerOrders.Add(order.Id, order);
-                        _bulls++;
-                        _stats[(Kp)(int)candlestick].Attempt = _stats[(Kp)(int)candlestick].Attempt + 1;
-
-                        SendNotification(candlestick);
-                    }
-
-                    if (IsBearishSentiment(candlestick))
-                    {
-                        order.IsLong = false;
-                        order.ExitAt = Close[0] - (Math.Abs(_strikeWidth) / 4);
-
-                        activerOrders.Add(order.Id, order);
-                        _bears++;
-
-                        _stats[(Kp)(int)candlestick].Attempt = _stats[(Kp)(int)candlestick].Attempt + 1;
-
-                        SendNotification(candlestick);
-                    }
-                }
                 candlestick = 0;
+                candlestick = KenCandleStickPattern(dood, 8)[0];
+                if (candlestick != 0)
+                    break;
+
+
+            }
+
+            if (IsBullishSentiment(candlestick) || IsBearishSentiment(candlestick))
+            {
+                var expiryTime = barTime.AddHours(1);
+
+                var
+                    order = new ActiveOrder
+                    {
+                        Id = Guid.NewGuid(),
+                        Time = barTime,
+                        ExpiryHour = expiryTime.Hour,
+                        ExpiryDay = expiryTime.Day,
+                        EnteredAt = Close[0],
+                        Kp = (Kp)(int)candlestick
+                    };
+
+
+                if (IsBullishSentiment(candlestick))
+                {
+                    order.IsLong = true;
+                    order.ExitAt = Close[0] + (Math.Abs(_strikeWidth) / 4);
+                    activerOrders.Add(order.Id, order);
+                    _bulls++;
+                    _stats[(Kp)(int)candlestick].Attempt = _stats[(Kp)(int)candlestick].Attempt + 1;
+
+                    SendNotification(candlestick);
+                }
+
+                if (IsBearishSentiment(candlestick))
+                {
+                    order.IsLong = false;
+                    order.ExitAt = Close[0] - (Math.Abs(_strikeWidth) / 4);
+
+                    activerOrders.Add(order.Id, order);
+                    _bears++;
+
+                    _stats[(Kp)(int)candlestick].Attempt = _stats[(Kp)(int)candlestick].Attempt + 1;
+
+                    SendNotification(candlestick);
+                }
             }
 
 
