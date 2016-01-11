@@ -54,7 +54,7 @@ namespace KenNinja
             {
                 if (_indicator.CurrentBar < 4)
 
-                if (_stocFunc(0) < 25)
+                if (_stocFunc(0) > 25)
                     return false;
 
 
@@ -71,7 +71,7 @@ namespace KenNinja
                 if (_indicator.CurrentBar < 1 || WasBearTrend(1))
                     return false;
 
-                if (_stocFunc(1) > 75)
+                if (_stocFunc(1) < 75)
                     return false;
 
                 return (_indicator.CurrentBar >= 2 && WasBullTrend(1) && DetermineIsDojiFor());
@@ -423,7 +423,7 @@ namespace KenNinja
         {
             get
             {
-                if (_indicator.CurrentBar < 1 || (_trendWeight > 0 && !isUpTrend))
+                if (_indicator.CurrentBar < 1 || !IsBearTrend)
                     return false;
 
                 if (_stocFunc(0) < 70)

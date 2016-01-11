@@ -61,7 +61,7 @@ namespace NinjaTrader.Custom.Strategy
 
             list = new[]
             {
-                -112
+                -107
             };
 
             
