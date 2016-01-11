@@ -54,7 +54,7 @@ namespace KenNinja
             {
                 if (_indicator.CurrentBar < 4)
 
-                if (_stocFunc(0) > 25)
+                if (_stocFunc(0) < 25)
                     return false;
 
 
