@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
+using System.Windows.Forms.VisualStyles;
 using KenNinja;
 using NinjaTrader.Cbi;
 
@@ -54,7 +55,15 @@ namespace NinjaTrader.Custom.Strategy
                 112
             };
 
+
+           
             list = Enum.GetValues(typeof(Kp)).Cast<Kp>().Select(z => z.ToInt()).ToArray();
+
+            list = new[]
+            {
+                -112
+            };
+
             
 
           
@@ -69,7 +78,7 @@ namespace NinjaTrader.Custom.Strategy
 
             var _binaryWidths= new SortedList<string, double> { { "$EURUSD", .01 }, { "$GPDUSD", .015 }, { "$USDJPY", .04 }, { "$AUDUSD", .00005 }, { "$USDCAD", .0011 }, { "$EURJPY", .1 } };
 
-            var  _spreadWidths = new SortedList<string, double> { { "$EURUSD", .0004 }, { "$GPDUSD", .001 }, { "$USDJPY", 1.0 }, { "$AUDUSD", .01 }, { "$USDCAD", .01 }, { "$EURJPY", 1.0 } };
+            //var  _spreadWidths = new SortedList<string, double> { { "$EURUSD", .0004 }, { "$GPDUSD", .001 }, { "$USDJPY", 1.0 }, { "$AUDUSD", .01 }, { "$USDCAD", .01 }, { "$EURJPY", 1.0 } };
 
 
             var _stikeWidths = _binaryWidths;
@@ -90,7 +99,7 @@ namespace NinjaTrader.Custom.Strategy
 
 
             Log(string.Format("Starting for KenCandleStickStrategy {0}", Instrument), LogLevel.Information);
-            ClearOutputWindow();
+           // ClearOutputWindow();
             CalculateOnBarClose = true; // only on bar close( this is a candle stick strategy)
             activerOrders = new SortedList<Guid, ActiveOrder>();
             _bulls = 0;
@@ -115,87 +124,97 @@ namespace NinjaTrader.Custom.Strategy
         protected override void OnBarUpdate()
         {
 
-            if (!Historical)
-                Log(string.Format("OnBarUpdate for {0}", Instrument), LogLevel.Information);
-
-            HandleCurrentOrders();
-
-
-
-            foreach (var dood in _stats.Where(z => z.Value.Success > 0).OrderByDescending(z=>z.Value.Success / z.Value.Attempt))
+            try
             {
-                Print(string.Format("{0}: {1} of {2} ({3}) successful", dood.Key, dood.Value.Success, dood.Value.Attempt, (dood.Value.Success/dood.Value.Attempt)));
-            }
+
+               
+                HandleCurrentOrders();
 
 
-            Print(string.Format("{0} of {1} bulls successful", _winningBulls, _bulls));
-            Print(string.Format("{0} of {1} bears successful", _winningBears, _bears));
-            Print(string.Format("{0} of {1} all successful", _winningBears + _winningBulls, _bears + _bulls));
+
+                foreach (
+                    var dood in
+                        _stats.Where(z => z.Value.Success > 0).OrderByDescending(z => z.Value.Success/z.Value.Attempt))
+                {
+                    Print(string.Format("{0}: {1} of {2} ({3}) successful", dood.Key, dood.Value.Success,
+                        dood.Value.Attempt, (dood.Value.Success/dood.Value.Attempt)));
+                }
 
 
-            
-            double candlestick = 0;
-
-            var barTime = DateTime.Parse(Time.ToString());
-
-     
-        
- 
-
-            //Is there any sentiment found
-            foreach (var dood in KpsToUse)
-            {
-                candlestick = 0;
-                candlestick = KenCandleStickPattern(dood, 8)[0];
-                if (candlestick != 0)
-                    break;
+                Print(string.Format("{0} of {1} bulls successful", _winningBulls, _bulls));
+                Print(string.Format("{0} of {1} bears successful", _winningBears, _bears));
+                Print(string.Format("{0} of {1} all successful", _winningBears + _winningBulls, _bears + _bulls));
 
 
-            }
 
-            if (IsBullishSentiment(candlestick) || IsBearishSentiment(candlestick))
-            {
-                var expiryTime = barTime.AddHours(1);
+                double candlestick = 0;
 
-                var
-                    order = new ActiveOrder
+                var barTime = DateTime.Parse(Time.ToString());
+
+
+
+
+
+                //Is there any sentiment found
+                foreach (var dood in KpsToUse)
+                {
+                    candlestick = 0;
+                    candlestick = KenCandleStickPattern(dood, 8)[0];
+                    if (candlestick != 0)
+                        break;
+
+
+                }
+
+                if (IsBullishSentiment(candlestick) || IsBearishSentiment(candlestick))
+                {
+                    var expiryTime = barTime.AddHours(1);
+
+                    var
+                        order = new ActiveOrder
+                        {
+                            Id = Guid.NewGuid(),
+                            Time = barTime,
+                            ExpiryHour = expiryTime.Hour,
+                            ExpiryDay = expiryTime.Day,
+                            EnteredAt = Close[0],
+                            Kp = (Kp) (int) candlestick
+                        };
+
+
+                    if (IsBullishSentiment(candlestick))
                     {
-                        Id = Guid.NewGuid(),
-                        Time = barTime,
-                        ExpiryHour = expiryTime.Hour,
-                        ExpiryDay = expiryTime.Day,
-                        EnteredAt = Close[0],
-                        Kp = (Kp)(int)candlestick
-                    };
+                        order.IsLong = true;
+                        order.ExitAt = Close[0] + (Math.Abs(_strikeWidth)/4);
+                        activerOrders.Add(order.Id, order);
+                        _bulls++;
+                        _stats[(Kp) (int) candlestick].Attempt = _stats[(Kp) (int) candlestick].Attempt + 1;
 
+                        SendNotification(candlestick);
+                    }
 
-                if (IsBullishSentiment(candlestick))
-                {
-                    order.IsLong = true;
-                    order.ExitAt = Close[0] + (Math.Abs(_strikeWidth) / 4);
-                    activerOrders.Add(order.Id, order);
-                    _bulls++;
-                    _stats[(Kp)(int)candlestick].Attempt = _stats[(Kp)(int)candlestick].Attempt + 1;
+                    if (IsBearishSentiment(candlestick))
+                    {
+                        order.IsLong = false;
+                        order.ExitAt = Close[0] - (Math.Abs(_strikeWidth)/4);
 
-                    SendNotification(candlestick);
+                        activerOrders.Add(order.Id, order);
+                        _bears++;
+
+                        _stats[(Kp) (int) candlestick].Attempt = _stats[(Kp) (int) candlestick].Attempt + 1;
+
+                        SendNotification(candlestick);
+                    }
                 }
 
-                if (IsBearishSentiment(candlestick))
-                {
-                    order.IsLong = false;
-                    order.ExitAt = Close[0] - (Math.Abs(_strikeWidth) / 4);
-
-                    activerOrders.Add(order.Id, order);
-                    _bears++;
-
-                    _stats[(Kp)(int)candlestick].Attempt = _stats[(Kp)(int)candlestick].Attempt + 1;
-
-                    SendNotification(candlestick);
-                }
+            }
+            catch (Exception e)
+            {
+                Log("error found:" + e.Message + " " + e.Source + " " + e.StackTrace, LogLevel.Error);
             }
 
 
-            
+
         }
 
         private void SendNotification(double candlestick)
@@ -206,8 +225,10 @@ namespace NinjaTrader.Custom.Strategy
 
             
             var isBull = IsBullishSentiment(candlestick);
-            var mailSubject = string.Format("KC-SIGNAL-{0}: {1} on {2} @ {3}", (isBull) ? "BULL" : "BEAR",
-                (Kp) candlestick, Instrument, Close[0]);
+            var instrumentName = this.Instrument.ToString().Replace("Default", "").Replace(" ", "").Replace("$", "");
+
+            var mailSubject = string.Format("KC-SIGNAL-{0}:  {1} @ {2} - {3} ", instrumentName, (isBull) ? "BULL" : "BEAR",
+                 Close[0], (Kp) candlestick);
             var mailContentTemplate = @"A {0} {4} signal was observed in '{1}' at {2} at a closing price of {3}.";
             var mailContent = string.Format(mailContentTemplate, (isBull) ? "BULL" : "BEAR", Instrument, Time, Close[0],
                 (Kp) candlestick);

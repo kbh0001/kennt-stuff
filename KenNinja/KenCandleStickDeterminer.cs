@@ -54,12 +54,12 @@ namespace KenNinja
             {
                 if (_indicator.CurrentBar < 4)
 
-                if (_stocFunc(0) > 35)
+                if (_stocFunc(0) > 25)
                     return false;
 
 
 
-                return (DetermineIsDojiFor() && IsBearCandle(1) && IsBearCandle(2) && IsBearCandle(3));
+                return (DetermineIsDojiFor() && IsBearCandle(1) && IsBearCandle(2));
             }
         }
 
@@ -71,10 +71,10 @@ namespace KenNinja
                 if (_indicator.CurrentBar < 1 || WasBearTrend(1))
                     return false;
 
-                if (_stocFunc(1) < 75)
+                if (_stocFunc(1) > 75)
                     return false;
 
-                return (_indicator.CurrentBar >= 2 && WasBullTrend(1) && DetermineIsDojiFor(1));
+                return (_indicator.CurrentBar >= 2 && WasBullTrend(1) && DetermineIsDojiFor());
             }
         }
 
@@ -142,7 +142,7 @@ namespace KenNinja
         {
             get
             {
-                if (_indicator.CurrentBar < 1 || (IsBullTrend))
+                if (_indicator.CurrentBar < 2 || (IsBullTrend))
                     return false;
 
                 return IsBullCandle() && IsBearCandle(1) &&
@@ -154,7 +154,7 @@ namespace KenNinja
         {
             get
             {
-                if (_indicator.CurrentBar < 1 || (IsBullTrend))
+                if (_indicator.CurrentBar < 2 || (IsBullTrend))
                     return false;
 
 
@@ -177,10 +177,14 @@ namespace KenNinja
             }
         }
 
-        public bool IsDownsideTasukiGap
+        public bool IsBearishDownsideTasukiGap
         {
             get
             {
+
+                if (IsBullTrend)
+                    return false;
+                
                 if (_indicator.CurrentBar < 2)
                     return false;
 
@@ -310,10 +314,13 @@ namespace KenNinja
             }
         }
 
-        public bool IsUpsideTasukiGap
+        public bool IsBullishUpsideTasukiGap
         {
             get
             {
+                if (IsBearTrend)
+                    return false;
+
                 if (_indicator.CurrentBar < 2)
                     return false;
 
@@ -467,7 +474,7 @@ namespace KenNinja
         {
             get
             {
-                if (_indicator.CurrentBar < 2)
+                if (_indicator.CurrentBar < 3)
                     return false;
 
                 return IsBearCandle(2) && _indicator.Close[1] < _indicator.Close[2] &&

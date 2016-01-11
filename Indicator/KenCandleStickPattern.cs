@@ -317,7 +317,7 @@ namespace NinjaTrader.Indicator
 
                 if (allowedPatterns.Contains(Kp.BearishDownsideTasukiGap))
                 {
-                    if (candleStickDeterminer.IsDownsideTasukiGap)
+                    if (candleStickDeterminer.IsBearishDownsideTasukiGap)
                     {
                         if (ChartControl != null)
                         {
@@ -691,7 +691,7 @@ namespace NinjaTrader.Indicator
                 if (allowedPatterns.Contains(Kp.BullishUpsideTasukiGap))
                 {
 
-                    if (candleStickDeterminer.IsUpsideTasukiGap)
+                    if (candleStickDeterminer.IsBullishUpsideTasukiGap)
                     {
                         if (ChartControl != null)
                         {
@@ -744,6 +744,7 @@ namespace NinjaTrader.Indicator
             }
             catch (Exception e)
             {
+                
                 Print("error found:" + e.Message + " " + e.Source + " " + e.StackTrace);
             }
         }
