@@ -34,6 +34,8 @@ namespace NinjaTrader.Custom.Strategy
         private int myInput0 = 1; // Default setting for MyInput0
         private double _strikeWidth;
 
+        private const int TrendStrength = 4;
+
 
         //Configure the allowed patterns that are significant order by performance.
         static KenCandleStickStrategy()
@@ -59,10 +61,7 @@ namespace NinjaTrader.Custom.Strategy
            
             list = Enum.GetValues(typeof(Kp)).Cast<Kp>().Select(z => z.ToInt()).ToArray();
 
-            list = new[]
-            {
-                -107
-            };
+        
 
             
 
@@ -76,9 +75,9 @@ namespace NinjaTrader.Custom.Strategy
         protected override void Initialize()
         {
 
-            var _binaryWidths= new SortedList<string, double> { { "$EURUSD", .01 }, { "$GPDUSD", .015 }, { "$USDJPY", .04 }, { "$AUDUSD", .00005 }, { "$USDCAD", .0011 }, { "$EURJPY", .1 } };
+            var _binaryWidths= new SortedList<string, double> { { "$EURUSD", .0004 }, { "$GBPUSD", .0010 }, { "$USDJPY", .04 }, { "$AUDUSD", .00005 }, { "$USDCAD", .0010 }, { "$EURJPY", .1 } };
 
-            //var  _spreadWidths = new SortedList<string, double> { { "$EURUSD", .0004 }, { "$GPDUSD", .001 }, { "$USDJPY", 1.0 }, { "$AUDUSD", .01 }, { "$USDCAD", .01 }, { "$EURJPY", 1.0 } };
+            //var  _spreadWidths = new SortedList<string, double> { { "$EURUSD", .0004 }, { "$GBPUSD", .001 }, { "$USDJPY", 1.0 }, { "$AUDUSD", .01 }, { "$USDCAD", .01 }, { "$EURJPY", 1.0 } };
 
 
             var _stikeWidths = _binaryWidths;
@@ -136,14 +135,15 @@ namespace NinjaTrader.Custom.Strategy
                     var dood in
                         _stats.Where(z => z.Value.Success > 0).OrderByDescending(z => z.Value.Success/z.Value.Attempt))
                 {
-                    Print(string.Format("{0}: {1} of {2} ({3}) successful", dood.Key, dood.Value.Success,
-                        dood.Value.Attempt, (dood.Value.Success/dood.Value.Attempt)));
+                    Print(string.Format("{0}-({4}): {1} of {2} ({3}) successful", dood.Key, dood.Value.Success,
+                        dood.Value.Attempt, (dood.Value.Success / dood.Value.Attempt), dood.Key.ToInt()));
                 }
 
 
-                Print(string.Format("{0} of {1} bulls successful", _winningBulls, _bulls));
-                Print(string.Format("{0} of {1} bears successful", _winningBears, _bears));
-                Print(string.Format("{0} of {1} all successful", _winningBears + _winningBulls, _bears + _bulls));
+                Print(string.Format("{0} of {1} bulls successful({2})", _winningBulls, _bulls, (_bulls > 0) ? (double)_winningBulls / _bulls : 0));
+                Print(string.Format("{0} of {1} bears successful({2})", _winningBears, _bears, (_bears > 0) ? (double)_winningBears / _bears : 0));
+                Print(string.Format("{0} of {1} all successful({2})", _winningBears + _winningBulls, _bears + _bulls, (_bears + _bulls > 0)?(double)(_winningBears + _winningBulls) / (_bears + _bulls):0));
+
 
 
 
@@ -151,6 +151,10 @@ namespace NinjaTrader.Custom.Strategy
 
                 var barTime = DateTime.Parse(Time.ToString());
 
+                //Make Sure there is enough movement to matter
+
+                if (!HasEnoughVoltility())
+                    return;
 
 
 
@@ -159,7 +163,7 @@ namespace NinjaTrader.Custom.Strategy
                 foreach (var dood in KpsToUse)
                 {
                     candlestick = 0;
-                    candlestick = KenCandleStickPattern(dood, 8)[0];
+                    candlestick = KenCandleStickPattern(dood, TrendStrength)[0];
                     if (candlestick != 0)
                         break;
 
@@ -178,32 +182,33 @@ namespace NinjaTrader.Custom.Strategy
                             ExpiryHour = expiryTime.Hour,
                             ExpiryDay = expiryTime.Day,
                             EnteredAt = Close[0],
-                            Kp = (Kp) (int) candlestick
+                            Kp = (Kp) (int) candlestick,
+                            StrikeWidth = _strikeWidth
                         };
 
 
                     if (IsBullishSentiment(candlestick))
                     {
                         order.IsLong = true;
-                        order.ExitAt = Close[0] + (Math.Abs(_strikeWidth)/4);
+                        order.ExitAt = Close[0] + (Math.Abs(_strikeWidth*.2));
                         activerOrders.Add(order.Id, order);
                         _bulls++;
                         _stats[(Kp) (int) candlestick].Attempt = _stats[(Kp) (int) candlestick].Attempt + 1;
 
-                        SendNotification(candlestick);
+                        SendNotification(candlestick, order);
                     }
 
                     if (IsBearishSentiment(candlestick))
                     {
                         order.IsLong = false;
-                        order.ExitAt = Close[0] - (Math.Abs(_strikeWidth)/4);
+                        order.ExitAt = Close[0] - (Math.Abs(_strikeWidth*2));
 
                         activerOrders.Add(order.Id, order);
                         _bears++;
 
                         _stats[(Kp) (int) candlestick].Attempt = _stats[(Kp) (int) candlestick].Attempt + 1;
 
-                        SendNotification(candlestick);
+                        SendNotification(candlestick, order);
                     }
                 }
 
@@ -217,7 +222,22 @@ namespace NinjaTrader.Custom.Strategy
 
         }
 
-        private void SendNotification(double candlestick)
+        private bool HasEnoughVoltility()
+        {
+            if (this.CurrentBar < TrendStrength)
+            {
+                return false;
+            }
+
+            var vals = Enumerable.Range(0, TrendStrength).Select(z => this.High[z] - this.Low[z]).ToList();
+            var avg = vals.Average();
+            var stddev = Math.Sqrt(vals.Average(v => Math.Pow(v - avg, 2)));
+
+            return stddev*3 > this._strikeWidth/2;
+
+        }
+
+        private void SendNotification(double candlestick, ActiveOrder order)
         {
 
             if (Historical)
@@ -229,9 +249,11 @@ namespace NinjaTrader.Custom.Strategy
 
             var mailSubject = string.Format("KC-SIGNAL-{0}:  {1} @ {2} - {3} ", instrumentName, (isBull) ? "BULL" : "BEAR",
                  Close[0], (Kp) candlestick);
-            var mailContentTemplate = @"A {0} {4} signal was observed in '{1}' at {2} at a closing price of {3}.";
+            var mailContentTemplate = @"A {0} {4} signal was observed in '{1}' at {2} at a closing price of {3}.
+Exit at {5}
+Strike Width: {6}";
             var mailContent = string.Format(mailContentTemplate, (isBull) ? "BULL" : "BEAR", Instrument, Time, Close[0],
-                (Kp) candlestick);
+                (Kp) candlestick, order.ExitAt, order.StrikeWidth);
             SendMail("hoskinsken@gmail.com", "hoskinsken@gmail.com", mailSubject, mailContent);
         }
 
@@ -303,6 +325,7 @@ namespace NinjaTrader.Custom.Strategy
 
         private class ActiveOrder
         {
+            public double StrikeWidth { get; set; }
             public Guid Id { get; set; }
             public DateTime Time { get; set; }
             public int ExpiryHour { get; set; }

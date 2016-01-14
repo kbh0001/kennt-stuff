@@ -279,6 +279,15 @@ namespace KenNinja
         {
             get
             {
+
+                if (_stocFunc(0) > 25)
+                    return false;
+
+                if (IsBullTrend)
+                    return false;
+
+                /*
+
                 if (_trendWeight > 0)
                 {
                     if (_indicator.CurrentBar > _trendWeight)
@@ -290,6 +299,7 @@ namespace KenNinja
                     else
                         return false;
                 }
+                 * */
 
 
                 return _indicator.Low[0] < _indicator.Open[0] - 5*_indicator.TickSize &&

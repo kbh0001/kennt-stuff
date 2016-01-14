@@ -87,7 +87,7 @@ namespace NinjaTrader.Indicator
             {
 
                 Func<int, double> stochFunc =
-                (int period) => this.Stochastics(this.trendStrength, this.trendStrength * 2, 3)[period];
+                (int period) => this.Stochastics(this.TrendStrength, this.TrendStrength*2, 3)[period];
 
 
                 var candleStickDeterminer = new KenCandleStickDeterminer(this, TrendStrength, stochFunc, Print);
