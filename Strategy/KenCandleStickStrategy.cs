@@ -190,7 +190,7 @@ namespace NinjaTrader.Custom.Strategy
                     if (IsBullishSentiment(candlestick))
                     {
                         order.IsLong = true;
-                        order.ExitAt = Close[0] + (Math.Abs(_strikeWidth*.2));
+                        order.ExitAt = Close[0] + (Math.Abs(_strikeWidth*.5));
                         activerOrders.Add(order.Id, order);
                         _bulls++;
                         _stats[(Kp) (int) candlestick].Attempt = _stats[(Kp) (int) candlestick].Attempt + 1;
@@ -201,7 +201,7 @@ namespace NinjaTrader.Custom.Strategy
                     if (IsBearishSentiment(candlestick))
                     {
                         order.IsLong = false;
-                        order.ExitAt = Close[0] - (Math.Abs(_strikeWidth*2));
+                        order.ExitAt = Close[0] - (Math.Abs(_strikeWidth*5));
 
                         activerOrders.Add(order.Id, order);
                         _bears++;

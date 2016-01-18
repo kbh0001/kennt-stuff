@@ -6,6 +6,8 @@ using System.ComponentModel;
 using System.Linq;
 using KenNinja;
 using NinjaTrader.Cbi;
+using NinjaTrader.Indicator;
+using NinjaTrader.Strategy;
 
 namespace NinjaTrader.Custom.Strategy
 {
@@ -36,6 +38,8 @@ namespace NinjaTrader.Custom.Strategy
 
         protected override void Initialize()
         {
+
+            
             var _binaryWidths = new SortedList<string, double>
             {
                 {"$EURUSD", .0004},
@@ -100,10 +104,10 @@ namespace NinjaTrader.Custom.Strategy
                     return;
 
 
-                var isBull = CrossAbove(Stochastics(3, 7, 3).D, Stochastics(3, 7, 3).K, 8) &&
-                             Stochastics(3, 7, 3).D[0] < 20;
-                var isBear = CrossBelow(Stochastics(3, 7, 3).D, Stochastics(3, 7, 3).K, 8) &&
-                             Stochastics(3, 7, 3).D[0] > 80;
+                var isBull = CrossAbove(StochasticsFunc().D, StochasticsFunc().K, 8) &&
+                             StochasticsFunc().D[0] < 20;
+                var isBear = CrossBelow(StochasticsFunc().D, StochasticsFunc().K, 8) &&
+                             StochasticsFunc().D[0] > 80;
 
 
                 if (isBull || isBear)
@@ -122,10 +126,14 @@ namespace NinjaTrader.Custom.Strategy
                         };
 
 
+                    
+
+
                     if (isBull)
                     {
+
                         order.IsLong = true;
-                        order.ExitAt = Close[0] + (Math.Abs(_strikeWidth*.2));
+                        order.ExitAt = Close[0] + (Math.Abs(_strikeWidth*.5));
                         _activerOrders.Add(order.Id, order);
                         _bulls++;
 
@@ -135,7 +143,7 @@ namespace NinjaTrader.Custom.Strategy
                     if (isBear)
                     {
                         order.IsLong = false;
-                        order.ExitAt = Close[0] - (Math.Abs(_strikeWidth*2));
+                        order.ExitAt = Close[0] - (Math.Abs(_strikeWidth*.5));
 
                         _activerOrders.Add(order.Id, order);
                         _bears++;
@@ -152,6 +160,13 @@ namespace NinjaTrader.Custom.Strategy
             }
         }
 
+        private Stochastics StochasticsFunc()
+        {
+            return Stochastics(3, 7, 3);
+        }
+
+      
+
         private bool HasEnoughVoltility()
         {
             if (CurrentBar < TrendStrength)
@@ -163,7 +178,7 @@ namespace NinjaTrader.Custom.Strategy
             var avg = vals.Average();
             var stddev = Math.Sqrt(vals.Average(v => Math.Pow(v - avg, 2)));
 
-            return stddev*3 > _strikeWidth/2;
+            return stddev*3 > _strikeWidth*2;
         }
 
         private void SendNotification(double candlestick, ActiveOrder order)
@@ -189,8 +204,10 @@ Strike Width: {4}";
 
         private void HandleCurrentOrders()
         {
-            if (_activerOrders.Any())
-            {
+            if (!_activerOrders.Any())
+                return;
+
+            
                 var currentNow = DateTime.Parse(Time.ToString());
                 
                 var successfulBulls = _activerOrders.Values.Where(z => z.IsLong && High[0] >= z.ExitAt).ToList();
@@ -225,11 +242,11 @@ Strike Width: {4}";
                         if (!candidate.IsLong && candidate.EnteredAt > Close[0])
                         {
                             _winningBears++;
-                        }
+                       }
                         _activerOrders.Remove(candidate.Id);
                     }
                 }
-            }
+            
         }
 
 
