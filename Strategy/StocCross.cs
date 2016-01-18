@@ -83,6 +83,7 @@ namespace NinjaTrader.Custom.Strategy
             {
                 HandleCurrentOrders();
 
+                
                 Print("");
 
                 Print(string.Format("{0} of {1} bulls successful({2})", _winningBulls, _bulls,
@@ -91,7 +92,7 @@ namespace NinjaTrader.Custom.Strategy
                     (_bears > 0) ? (double) _winningBears/_bears : 0));
                 Print(string.Format("{0} of {1} all successful({2})", _winningBears + _winningBulls, _bears + _bulls,
                     (_bears + _bulls > 0) ? (double) (_winningBears + _winningBulls)/(_bears + _bulls) : 0));
-
+                
 
                 double candlestick = 0;
 
@@ -100,7 +101,6 @@ namespace NinjaTrader.Custom.Strategy
                 //Make Sure there is enough movement to matter
 
                 if (!HasEnoughVoltility())
-					
                     return;
 
 
@@ -126,31 +126,32 @@ namespace NinjaTrader.Custom.Strategy
                         };
 
 
-                    
 
-
-                    if (isBull)
+                    if (isBull && IsBullPrevailingTrend())
                     {
 
                         order.IsLong = true;
                         order.ExitAt = Close[0] + (Math.Abs(_strikeWidth*.5));
+                        order.SettleAT = Close[0] + (Math.Abs(_strikeWidth * .25));
                         _activerOrders.Add(order.Id, order);
                         _bulls++;
 
                         SendNotification(candlestick, order);
                     }
 
-                    if (isBear)
+
+                    if (isBear && IsBearPrevailingTrend())
                     {
                         order.IsLong = false;
                         order.ExitAt = Close[0] - (Math.Abs(_strikeWidth*.5));
+                        order.SettleAT = Close[0] - (Math.Abs(_strikeWidth * .25));
 
                         _activerOrders.Add(order.Id, order);
                         _bears++;
-
-
                         SendNotification(candlestick, order);
                     }
+                     
+                   
                 }
             }
             catch (Exception e)
@@ -165,10 +166,28 @@ namespace NinjaTrader.Custom.Strategy
             return Stochastics(3, 7, 3);
         }
 
-      
+        private bool IsBullPrevailingTrend()
+        {
+            return true;
+            return Slope(SMA(20), 8, 0) > 0;
+
+        }
+
+        private bool IsBearPrevailingTrend()
+        {
+            return true;
+            return Slope(SMA(20), 8, 0) < 0;
+
+        }
+
+
+
+
+
 
         private bool HasEnoughVoltility()
         {
+
             if (CurrentBar < TrendStrength)
             {
                 return false;
@@ -178,7 +197,7 @@ namespace NinjaTrader.Custom.Strategy
             var avg = vals.Average();
             var stddev = Math.Sqrt(vals.Average(v => Math.Pow(v - avg, 2)));
 
-            return stddev*3 > _strikeWidth*2;
+            return stddev > _strikeWidth;
         }
 
         private void SendNotification(double candlestick, ActiveOrder order)
@@ -235,11 +254,11 @@ Strike Width: {4}";
 
                     foreach (var candidate in closingOrders)
                     {
-                        if (candidate.IsLong && candidate.EnteredAt < Close[0])
+                        if (candidate.IsLong && candidate.SettleAT < Open[0])
                         {
                             _winningBulls++;
                         }
-                        if (!candidate.IsLong && candidate.EnteredAt > Close[0])
+                        if (!candidate.IsLong && candidate.SettleAT > Open[0])
                         {
                             _winningBears++;
                        }
@@ -260,6 +279,7 @@ Strike Width: {4}";
             public bool IsLong { get; set; }
             public double EnteredAt { get; set; }
             public double ExitAt { get; set; }
+            public double SettleAT { get; set; }
         }
     }
 }
