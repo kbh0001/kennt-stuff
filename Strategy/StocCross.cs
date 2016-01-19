@@ -100,14 +100,14 @@ namespace NinjaTrader.Custom.Strategy
 
                 //Make Sure there is enough movement to matter
 
-                if (!HasEnoughVoltility())
-                    return;
+               // if (!HasEnoughVoltility())
+               //     return;
 
 
-                var isBull = CrossAbove(StochasticsFunc().D, StochasticsFunc().K, 8) &&
-                             StochasticsFunc().D[0] < 20;
-                var isBear = CrossBelow(StochasticsFunc().D, StochasticsFunc().K, 8) &&
-                             StochasticsFunc().D[0] > 80;
+                var isBull = CrossAbove(StochasticsFunc().D, StochasticsFunc().K, 1) &&
+                             StochasticsFunc().D[0] < 30;
+                var isBear = CrossBelow(StochasticsFunc().D, StochasticsFunc().K, 1) &&
+                             StochasticsFunc().D[0] > 70;
 
 
                 if (isBull || isBear)
@@ -212,7 +212,7 @@ namespace NinjaTrader.Custom.Strategy
                 Close[0]);
             var mailContentTemplate = @"A {0} signal was observed in '{1}' at {2} at a closing price of {3}.
 Exit at {4}
-Strike Width: {4}";
+Strike Width: {5}";
             var mailContent = string.Format(mailContentTemplate, (order.IsLong) ? "BULL" : "BEAR", Instrument, Time,
                 Close[0], order.ExitAt, order.StrikeWidth);
 			
