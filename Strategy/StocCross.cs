@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using KenNinja;
 using NinjaTrader.Cbi;
+using NinjaTrader.Gui.Chart;
 using NinjaTrader.Indicator;
 using NinjaTrader.Strategy;
 
@@ -42,12 +43,17 @@ namespace NinjaTrader.Custom.Strategy
             
             var _binaryWidths = new SortedList<string, double>
             {
-                {"$EURUSD", .0004},
-                {"$GBPUSD", .0010},
-                {"$USDJPY", .04},
+                {"$AUDJPY", .05},
                 {"$AUDUSD", .0005},
+                {"$EURGBP", .00010},
+                {"$EURJPY", .1},
+                {"$EURUSD", .0004},
+                {"$GBPJPY", .1},
+                {"$GBPUSD", .0010},
                 {"$USDCAD", .0010},
-                {"$EURJPY", .1}
+                {"$USDCHF", .0004},
+                {"$USDJPY", .04},
+                
             };
 
             //var  _spreadWidths = new SortedList<string, double> { { "$EURUSD", .0004 }, { "$GBPUSD", .001 }, { "$USDJPY", 1.0 }, { "$AUDUSD", .01 }, { "$USDCAD", .01 }, { "$EURJPY", 1.0 } };
@@ -84,6 +90,8 @@ namespace NinjaTrader.Custom.Strategy
                 HandleCurrentOrders();
 
                 
+
+                
                 Print("");
 
                 Print(string.Format("{0} of {1} bulls successful({2})", _winningBulls, _bulls,
@@ -92,26 +100,33 @@ namespace NinjaTrader.Custom.Strategy
                     (_bears > 0) ? (double) _winningBears/_bears : 0));
                 Print(string.Format("{0} of {1} all successful({2})", _winningBears + _winningBulls, _bears + _bulls,
                     (_bears + _bulls > 0) ? (double) (_winningBears + _winningBulls)/(_bears + _bulls) : 0));
-                
 
-                double candlestick = 0;
+
+                if (DateTime.Parse(this.Time.ToString()).Minute > 21)
+                    return;
+
+
 
                 var barTime = DateTime.Parse(Time.ToString());
 
-                //Make Sure there is enough movement to matter
+        
 
-               // if (!HasEnoughVoltility())
-               //     return;
+      
 
 
-                var isBull = CrossAbove(StochasticsFunc().D, StochasticsFunc().K, 1) &&
-                             StochasticsFunc().D[0] < 30;
-                var isBear = CrossBelow(StochasticsFunc().D, StochasticsFunc().K, 1) &&
-                             StochasticsFunc().D[0] > 70;
+                var isBull = StochasticsFunc().D[0] > StochasticsFunc().K[0] && StochasticsFunc().D[1] < StochasticsFunc().K[1] &&
+                             StochasticsFunc().D[0] < 40;
+
+
+                var isBear = StochasticsFunc().D[0] < StochasticsFunc().K[0] && StochasticsFunc().D[1] > StochasticsFunc().K[1] &&
+                             StochasticsFunc().D[0] > 60;
 
 
                 if (isBull || isBear)
                 {
+
+                    
+
                     var expiryTime = barTime.AddHours(1);
 
                     var
@@ -125,9 +140,9 @@ namespace NinjaTrader.Custom.Strategy
                             StrikeWidth = _strikeWidth
                         };
 
+        
 
-
-                    if (isBull && IsBullPrevailingTrend())
+                    if (isBull)
                     {
 
                         order.IsLong = true;
@@ -136,11 +151,11 @@ namespace NinjaTrader.Custom.Strategy
                         _activerOrders.Add(order.Id, order);
                         _bulls++;
 
-                        SendNotification(candlestick, order);
+                        SendNotification(order);
                     }
 
 
-                    if (isBear && IsBearPrevailingTrend())
+                    if (isBear)
                     {
                         order.IsLong = false;
                         order.ExitAt = Close[0] - (Math.Abs(_strikeWidth*.5));
@@ -148,7 +163,7 @@ namespace NinjaTrader.Custom.Strategy
 
                         _activerOrders.Add(order.Id, order);
                         _bears++;
-                        SendNotification(candlestick, order);
+                        SendNotification(order);
                     }
                      
                    
@@ -161,24 +176,14 @@ namespace NinjaTrader.Custom.Strategy
             }
         }
 
+
+
         private Stochastics StochasticsFunc()
         {
             return Stochastics(3, 7, 3);
         }
 
-        private bool IsBullPrevailingTrend()
-        {
-            return true;
-            return Slope(SMA(20), 8, 0) > 0;
 
-        }
-
-        private bool IsBearPrevailingTrend()
-        {
-            return true;
-            return Slope(SMA(20), 8, 0) < 0;
-
-        }
 
 
 
@@ -200,7 +205,7 @@ namespace NinjaTrader.Custom.Strategy
             return stddev > _strikeWidth;
         }
 
-        private void SendNotification(double candlestick, ActiveOrder order)
+        private void SendNotification(ActiveOrder order)
         {
             
 
