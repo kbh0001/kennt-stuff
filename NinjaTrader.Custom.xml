@@ -6963,6 +6963,9 @@
             <summary>
             Get Some Data
             </summary>
+            
+            
+            
         </member>
         <member name="T:NinjaTrader.Data.DayBarsType">
             <summary>

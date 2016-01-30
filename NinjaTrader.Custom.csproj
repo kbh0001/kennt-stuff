@@ -400,6 +400,9 @@
     <Compile Include="Strategy\%40Strategy.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Strategy\MoveActiveOrderTracker.cs" />
+    <Compile Include="Strategy\MoveGenericActiveOrder.cs" />
+    <Compile Include="Strategy\MOVE_BinaryStrikeWidthProvider.cs" />
     <Compile Include="Strategy\DataExtractor.cs" />
     <Compile Include="Strategy\KenCandleStickStrategy.cs" />
     <Compile Include="Strategy\SmaSlope.cs" />
@@ -501,6 +504,9 @@
       <Project>{bab9e6f8-7ebd-449b-9049-0a6c7be7ee70}</Project>
       <Name>KenNinja</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Strategy\MoveToNinja\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
