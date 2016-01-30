@@ -402,6 +402,7 @@
     </Compile>
     <Compile Include="Strategy\DataExtractor.cs" />
     <Compile Include="Strategy\KenCandleStickStrategy.cs" />
+    <Compile Include="Strategy\SmaSlope.cs" />
     <Compile Include="Strategy\StocCross.cs" />
     <Compile Include="Strategy\UserDefinedMethods.cs" />
     <Compile Include="Type\%40BarsTypes.cs" />

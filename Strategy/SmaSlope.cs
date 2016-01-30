@@ -1,20 +1,17 @@
-// This namespace holds all strategies and is required. Do not change it.
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Forms.VisualStyles;
 using KenNinja;
 using NinjaTrader.Cbi;
+using NinjaTrader.Data;
 using NinjaTrader.Indicator;
 
 namespace NinjaTrader.Custom.Strategy
 {
-    /// <summary>
-    /// Get Some Data
-    /// </summary>
     [Description("Get Some Data")]
-    public class StocCross : NinjaTrader.Strategy.Strategy
+    public class SmaSlope : NinjaTrader.Strategy.Strategy
     {
         // User defined variables (add any user defined variables below)
 
@@ -27,16 +24,16 @@ namespace NinjaTrader.Custom.Strategy
         private double _strikeWidth;
         private int _winningBears;
         private int _winningBulls;
+        private SortedList<int, double> _smaSlopeHistory;
 
 
-        //Configure the allowed patterns that are significant order by performance.
-        static StocCross()
-        {
-        }
+     
 
 
         protected override void Initialize()
         {
+
+            _smaSlopeHistory = new SortedList<int, double>();
             var _binaryWidths = new SortedList<string, double>
             {
                 {"$AUDJPY", .05},
@@ -80,6 +77,14 @@ namespace NinjaTrader.Custom.Strategy
 
         protected override void OnBarUpdate()
         {
+
+            RecordSmaSlope();
+
+            //bail if we don't have enough bars
+            if (this.CurrentBar < 12)
+                return;
+
+
             try
             {
                 HandleCurrentOrders();
@@ -91,15 +96,15 @@ namespace NinjaTrader.Custom.Strategy
                 Print("");
 
                 Print(string.Format("{0} of {1} bulls successful({2})", _winningBulls, _bulls,
-                    (_bulls > 0) ? (double) _winningBulls/_bulls : 0));
+                    (_bulls > 0) ? (double)_winningBulls / _bulls : 0));
                 Print(string.Format("{0} of {1} bears successful({2})", _winningBears, _bears,
-                    (_bears > 0) ? (double) _winningBears/_bears : 0));
+                    (_bears > 0) ? (double)_winningBears / _bears : 0));
                 Print(string.Format("{0} of {1} all successful({2})", _winningBears + _winningBulls, _bears + _bulls,
-                    (_bears + _bulls > 0) ? (double) (_winningBears + _winningBulls)/(_bears + _bulls) : 0));
+                    (_bears + _bulls > 0) ? (double)(_winningBears + _winningBulls) / (_bears + _bulls) : 0));
 
 
-                 //if (DateTime.Parse(Time.ToString()).Minute > 21)
-                  //  return;
+                //if (DateTime.Parse(Time.ToString()).Minute > 21)
+                //  return;
 
 
                 var barTime = DateTime.Parse(Time.ToString());
@@ -131,7 +136,7 @@ namespace NinjaTrader.Custom.Strategy
                     {
                         order.IsLong = true;
                         order.ExitAt = Close[0] + (Math.Abs(_strikeWidth));
-                        order.SettleAT = Close[0] + (Math.Abs(_strikeWidth*.25));
+                        order.SettleAT = Close[0] + (Math.Abs(_strikeWidth * .25));
                         _activerOrders.Add(order.Id, order);
                         _bulls++;
 
@@ -143,7 +148,7 @@ namespace NinjaTrader.Custom.Strategy
                     {
                         order.IsLong = false;
                         order.ExitAt = Close[0] - (Math.Abs(_strikeWidth));
-                        order.SettleAT = Close[0] - (Math.Abs(_strikeWidth*.25));
+                        order.SettleAT = Close[0] - (Math.Abs(_strikeWidth * .25));
 
                         _activerOrders.Add(order.Id, order);
                         _bears++;
@@ -158,60 +163,77 @@ namespace NinjaTrader.Custom.Strategy
             }
         }
 
-        private bool IsBear()
-
-
+        private void RecordSmaSlope()
         {
+            var slope = CalculateCurrentSmaSlope();
+
+            if (_smaSlopeHistory.ContainsKey(this.CurrentBar))
+                _smaSlopeHistory[this.CurrentBar] = slope;
+            else
+            {
+                _smaSlopeHistory.Add(this.CurrentBar, slope);
+            }
+        }
+
+        private double CalculateCurrentSmaSlope()
+        {
+            return this.Slope(this.SMA(6), 2, 0);
+        }
+
+        private bool IsBear()
+        {
+            
+
             if (!HasEnoughVoltility())
                 return false;
 
-            return IsBearCrossOver(0)  && Slope(StochasticsFunc().K, 1, 0) < 0;
+            if (!_smaSlopeHistory.ContainsKey(this.CurrentBar - 1))
+                return false;
+
+
+            var currentSlope = CalculateCurrentSmaSlope();
+            var priorSlope = _smaSlopeHistory[this.CurrentBar - 1];
+
+            return (currentSlope < 0 && priorSlope > 0);
+
+
+
         }
 
-        private bool IsBearCrossOver(int barsAgo)
-        {
-            return StochasticsFunc().D[barsAgo] > StochasticsFunc().K[barsAgo] &&
-                   StochasticsFunc().D[barsAgo + 1] < StochasticsFunc().K[barsAgo + 11];
-        }
+       
+
 
         private bool IsBull()
-
-
         {
-
-            if ExcludeTradeHistoryInBacktest.
 
             if (!HasEnoughVoltility())
-                return false;
+               return false;
 
-            return IsBullCrossOver(0)  && Slope(StochasticsFunc().K, 1, 0) > 0;
+
+
+       
+            
+            
+
+            return false;
+
+
+
         }
 
-        private bool IsBullCrossOver(int barsAgo)
-        {
-            return StochasticsFunc().D[barsAgo] < StochasticsFunc().K[barsAgo] &&
-                   StochasticsFunc().D[barsAgo + 1] > StochasticsFunc().K[barsAgo + 1];
-        }
+ 
 
 
-        private Stochastics StochasticsFunc()
-        {
-            return Stochastics(3, 7, 3);
-        }
+ 
+
+        
+
 
 
         private bool HasEnoughVoltility()
         {
-            if (CurrentBar < TrendStrength)
-            {
-                return false;
-            }
+           return this.Bollinger(2,12).Upper[0] - this.Bollinger(2,12).Lower[0] > _strikeWidth * 2;
 
-            var vals = Enumerable.Range(0, TrendStrength).Select(z => High[z] - Low[z]).ToList();
-            var avg = vals.Average();
-            var stddev = Math.Sqrt(vals.Average(v => Math.Pow(v - avg, 2)));
-
-            return stddev > _strikeWidth;
         }
 
         private void SendNotification(ActiveOrder order)
@@ -255,7 +277,7 @@ Strike Width: {5}";
                 _winningBears++;
             }
 
-            
+
             if (currentNow.Minute == 00)
             {
                 var closingOrders =
@@ -276,7 +298,7 @@ Strike Width: {5}";
                     _activerOrders.Remove(candidate.Id);
                 }
             }
-             
+
         }
 
 
