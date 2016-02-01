@@ -8,7 +8,7 @@ namespace NinjaTrader.Custom.Strategy
         {
             {"$AUDJPY", .05},
             {"$AUDUSD", .0005},
-            {"$EURGBP", .00010},
+            {"$EURGBP", .001},
             {"$EURJPY", .1},
             {"$EURUSD", .0004},
             {"$GBPJPY", .1},

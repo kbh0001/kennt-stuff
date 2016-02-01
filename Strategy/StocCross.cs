@@ -3,16 +3,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using KenNinja;
 using NinjaTrader.Cbi;
 using NinjaTrader.Indicator;
+using System.Linq;
 
 namespace NinjaTrader.Custom.Strategy
-
-
-
 {
     /// <summary>
     /// Get Some Data
@@ -29,8 +26,8 @@ namespace NinjaTrader.Custom.Strategy
         private const int TrendStrength = 4;
         private static readonly List<Kp> KpsToUse;
         private static int tradeId = 0;
-        private double _strikeWidth;
         private MoveActiveOrderTracker _activeOrderTracker;
+        private double _strikeWidth;
 
 
         //Configure the allowed patterns that are significant order by performance.
@@ -38,15 +35,14 @@ namespace NinjaTrader.Custom.Strategy
         {
         }
 
-        
-
 
         protected override void Initialize()
         {
             var instrument = Instrument.ToString().ToUpper().Replace("DEFAULT", "").Replace(" ", "");
             _strikeWidth = MoveBinaryStrikeWidthProvider.GetBinaryStrikeWidthFor(instrument);
             _activeOrderTracker = new MoveActiveOrderTracker();
-            Log(string.Format("Starting for KenCandleStickStrategy {0}", Instrument), LogLevel.Information);
+            _activeOrderTracker.PrintFunction = Print;
+            Print(string.Format("Starting for KenCandleStickStrategy {0}", Instrument));
             CalculateOnBarClose = true; //only on bar close
         }
 
@@ -55,43 +51,73 @@ namespace NinjaTrader.Custom.Strategy
         {
             try
             {
+                var now = DateTime.Parse(Time.ToString());
+                _activeOrderTracker.HandleCurrentOrders(now, Open[0], Close[0], High[0], Low[0]);
 
-                var barTime = DateTime.Parse(Time.ToString());
-                _activeOrderTracker.HandleCurrentOrders(barTime, Open[0], Close[0], High[0], Low[0]);
-
-
+                
                 Print("");
 
-                Print(string.Format("{0} of {1} bulls successful({2})", _activeOrderTracker.WinningBulls, _activeOrderTracker.Bulls,
-                    (_activeOrderTracker.Bulls > 0) ? (double)_activeOrderTracker.WinningBulls / _activeOrderTracker.Bulls : 0));
-                Print(string.Format("{0} of {1} bears successful({2})", _activeOrderTracker.WinningBears, _activeOrderTracker.Bears,
-                    (_activeOrderTracker.Bears > 0) ? (double)_activeOrderTracker.WinningBears / _activeOrderTracker.Bears : 0));
-                Print(string.Format("{0} of {1} all successful({2})", _activeOrderTracker.WinningBears + _activeOrderTracker.WinningBulls, _activeOrderTracker.Bears + _activeOrderTracker.Bulls,
-                    (_activeOrderTracker.Bears + _activeOrderTracker.Bulls > 0) ? (double)(_activeOrderTracker.WinningBears + _activeOrderTracker.WinningBulls) / (_activeOrderTracker.Bears + _activeOrderTracker.Bulls) : 0));
+                Print(string.Format("{0} of {1} bulls successful({2})", _activeOrderTracker.WinningBulls,
+                    _activeOrderTracker.Bulls,
+                    (_activeOrderTracker.Bulls > 0)
+                        ? (double) _activeOrderTracker.WinningBulls/_activeOrderTracker.Bulls
+                        : 0));
+                Print(string.Format("{0} of {1} bears successful({2})", _activeOrderTracker.WinningBears,
+                    _activeOrderTracker.Bears,
+                    (_activeOrderTracker.Bears > 0)
+                        ? (double) _activeOrderTracker.WinningBears/_activeOrderTracker.Bears
+                        : 0));
+                Print(string.Format("{0} of {1} all successful({2})",
+                    _activeOrderTracker.WinningBears + _activeOrderTracker.WinningBulls,
+                    _activeOrderTracker.Bears + _activeOrderTracker.Bulls,
+                    (_activeOrderTracker.Bears + _activeOrderTracker.Bulls > 0)
+                        ? (double) (_activeOrderTracker.WinningBears + _activeOrderTracker.WinningBulls)/
+                          (_activeOrderTracker.Bears + _activeOrderTracker.Bulls)
+                        : 0));
+                
 
-
-                 //if (DateTime.Parse(Time.ToString()).Minute > 21)
-                  //  return;
-
-
-               
 
 
                 var isBull = IsBull();
-
-
                 var isBear = IsBear();
+                var volScore = GetVoltilityScore();
 
 
-                if (isBull || isBear)
+                if (isBull && volScore == Volatility.High && (new int[] { 0, 10, 20 }).Contains(now.Minute))
                 {
-                    var expiryTime = barTime.AddHours(1);
+             
+                    var expiryTime = now.AddHours(1);
 
                     var
                         order = new MoveGenericActiveOrder
                         {
                             Id = Guid.NewGuid(),
-                            Time = barTime,
+                            Time = now,
+                            ExpiryHour = expiryTime.Hour,
+                            ExpiryDay = expiryTime.Day,
+                            EnteredAt = Close[0],
+                            StrikeWidth = _strikeWidth
+                        };
+
+                    order.IsLong = true;
+                    order.SuccessFullySettlesAt = Close[0] + (Math.Abs(_strikeWidth*.25));
+                    order.ExitStrategy = new BullishOtmExitStrategy(Close[0] + (Math.Abs(_strikeWidth)));
+                    SendNotification(order);
+
+
+                    _activeOrderTracker.AddOrder(order);
+                }
+
+
+                else if (false && isBear && volScore == Volatility.High && now.Minute < 21)
+                {
+                    var expiryTime = now.AddHours(1);
+
+                    var
+                        order = new MoveGenericActiveOrder
+                        {
+                            Id = Guid.NewGuid(),
+                            Time = now,
                             ExpiryHour = expiryTime.Hour,
                             ExpiryDay = expiryTime.Day,
                             EnteredAt = Close[0],
@@ -99,25 +125,39 @@ namespace NinjaTrader.Custom.Strategy
                         };
 
 
-                    if (isBull)
-                    {
-                        order.IsLong = true;
-                        order.ExitAt = Close[0] + (Math.Abs(_strikeWidth));
-                        order.SettleAT = Close[0] + (Math.Abs(_strikeWidth*.25));
-                        SendNotification(order);
-                    }
+                    order.IsLong = false;
+                    order.SuccessFullySettlesAt = Close[0] - (Math.Abs(_strikeWidth*.25));
+                    order.ExitStrategy = new BearishOtmExitStrategy(Close[0] - (Math.Abs(_strikeWidth)));
+                    SendNotification(order);
+                    _activeOrderTracker.AddOrder(order);
+                }
 
+                
+                else if  (false && isBull && volScore == Volatility.Low && (new int[]{40,50}).Contains(now.Minute))
+                {
+                    Print("Low bull found");
+                    var expiryTime = now;
 
-                    else
-                    {
-                        order.IsLong = false;
-                        order.ExitAt = Close[0] - (Math.Abs(_strikeWidth));
-                        order.SettleAT = Close[0] - (Math.Abs(_strikeWidth*.25));
-                        SendNotification(order);
-                    }
+                    var
+                        order = new MoveGenericActiveOrder
+                        {
+                            Id = Guid.NewGuid(),
+                            Time = now,
+                            ExpiryHour = expiryTime.Hour,
+                            ExpiryDay = expiryTime.Day,
+                            EnteredAt = Close[0],
+                            StrikeWidth = _strikeWidth,
+                            SuccessFullySettlesAt = Close[0] - (Math.Abs(_strikeWidth * .25)),
+                            IsLong = true,
+                            ExitStrategy = new BullishItmExitStrategy(Close[0] - (Math.Abs(_strikeWidth * 5)))
+                        };
+
+                    SendNotification(order);
+
 
                     _activeOrderTracker.AddOrder(order);
                 }
+                 
             }
             catch (Exception e)
             {
@@ -130,10 +170,7 @@ namespace NinjaTrader.Custom.Strategy
 
 
         {
-            if (!HasEnoughVoltility())
-                return false;
-
-            return IsBearCrossOver(0)  && Slope(StochasticsFunc().K, 1, 0) < 0;
+            return IsBearCrossOver(0) && Slope(StochasticsFunc().K, 1, 0) < 0;
         }
 
         private bool IsBearCrossOver(int barsAgo)
@@ -144,13 +181,7 @@ namespace NinjaTrader.Custom.Strategy
 
         private bool IsBull()
         {
-
-            
-
-            if (!HasEnoughVoltility())
-                return false;
-
-            return IsBullCrossOver(0)  && Slope(StochasticsFunc().K, 1, 0) > 0;
+            return IsBullCrossOver(0) && Slope(StochasticsFunc().K, 1, 0) > 0;
         }
 
         private bool IsBullCrossOver(int barsAgo)
@@ -166,19 +197,25 @@ namespace NinjaTrader.Custom.Strategy
         }
 
 
-        private bool HasEnoughVoltility()
+        private Volatility GetVoltilityScore()
         {
-            if (CurrentBar < TrendStrength)
-            {
-                return false;
-            }
+            var bolRange = Bollinger(2, 12).Upper[0] - Bollinger(2, 12).Lower[0];
+        
 
-            var vals = Enumerable.Range(0, TrendStrength).Select(z => High[z] - Low[z]).ToList();
-            var avg = vals.Average();
-            var stddev = Math.Sqrt(vals.Average(v => Math.Pow(v - avg, 2)));
 
-            return stddev > _strikeWidth;
+            if (bolRange > _strikeWidth*4)
+                return Volatility.High;
+
+       
+         
+            if (bolRange < _strikeWidth*2)
+                return Volatility.Low;
+
+
+            return Volatility.Medium;
+            
         }
+
 
         private void SendNotification(MoveGenericActiveOrder order)
         {
@@ -197,7 +234,5 @@ Strike Width: {5}";
                 return;
             SendMail("hoskinsken@gmail.com", "hoskinsken@gmail.com", mailSubject, mailContent);
         }
-
-  
     }
 }

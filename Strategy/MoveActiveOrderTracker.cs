@@ -14,6 +14,10 @@ namespace NinjaTrader.Custom.Strategy
         private double _strikeWidth;
         private int _winningBears;
         private int _winningBulls;
+        private Action<string> _printFunction;
+
+
+       
 
 
         public int Bears
@@ -36,6 +40,18 @@ namespace NinjaTrader.Custom.Strategy
             get { return _winningBulls; }
         }
 
+        public Action<string> PrintFunction
+        {
+            get { return _printFunction; }
+            set { _printFunction = value; }
+        }
+
+        public void Print(string message)
+        {
+            if (_printFunction != null)
+                _printFunction(message);
+        }
+
         public void AddOrder(MoveGenericActiveOrder order)
         {
             if (order.IsLong)
@@ -53,16 +69,18 @@ namespace NinjaTrader.Custom.Strategy
             if (!_activerOrders.Any())
                 return;
            
-
-            var successfulBulls = _activerOrders.Values.Where(z => z.IsLong && high >= z.ExitAt).ToList();
+            
+            var successfulBulls = _activerOrders.Values.Where(z => z.IsLong && z.ExitStrategy.ExitSuccessfull(z, now, open, close, high, low)).ToList();
             foreach (var success in successfulBulls)
             {
                 _activerOrders.Remove(success.Id);
                 _winningBulls++;
             }
 
+            
 
-            var successfulBears = _activerOrders.Values.Where(z => !z.IsLong && low <= z.ExitAt).ToList();
+
+            var successfulBears = _activerOrders.Values.Where(z => !z.IsLong && z.ExitStrategy.ExitSuccessfull(z, now, open, close, high, low)).ToList();
             foreach (var success in successfulBears)
             {
                 _activerOrders.Remove(success.Id);
@@ -70,20 +88,29 @@ namespace NinjaTrader.Custom.Strategy
             }
 
 
+            var failures = _activerOrders.Values.Where(z =>z.ExitStrategy.ExitFailed(z, now, open, close, high, low)).ToList();
+            foreach (var success in failures)
+            {
+                _activerOrders.Remove(success.Id);
+            }
+            
+
+
             if (now.Minute == 00)
             {
                 var closingOrders =
                     _activerOrders.Values.Where(
-                        z => z.ExpiryDay == now.Day && z.ExpiryHour == now.Hour)
+                        z => z.ExpiryDay == now.Day && z.ExpiryHour == now.Hour-1)
                         .ToList();
 
                 foreach (var candidate in closingOrders)
                 {
-                    if (candidate.IsLong && candidate.SettleAT < open)
+                    
+                    if (candidate.IsLong && candidate.SuccessFullySettlesAt < open)
                     {
                         _winningBulls++;
                     }
-                    if (!candidate.IsLong && candidate.SettleAT > open)
+                    if (!candidate.IsLong && candidate.SuccessFullySettlesAt > open)
                     {
                         _winningBears++;
                     }

@@ -401,13 +401,19 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Strategy\MoveActiveOrderTracker.cs" />
+    <Compile Include="Strategy\BearishOtmExitStrategy.cs" />
+    <Compile Include="Strategy\BullishOtmExitStrategy.cs" />
+    <Compile Include="Strategy\MoveExitStrategyBase.cs" />
     <Compile Include="Strategy\MoveGenericActiveOrder.cs" />
+    <Compile Include="Strategy\BearishItmExitStrategy.cs" />
+    <Compile Include="Strategy\BullishItmExitStrategy.cs" />
     <Compile Include="Strategy\MOVE_BinaryStrikeWidthProvider.cs" />
     <Compile Include="Strategy\DataExtractor.cs" />
     <Compile Include="Strategy\KenCandleStickStrategy.cs" />
     <Compile Include="Strategy\SmaSlope.cs" />
     <Compile Include="Strategy\StocCross.cs" />
     <Compile Include="Strategy\UserDefinedMethods.cs" />
+    <Compile Include="Strategy\Volatility.cs" />
     <Compile Include="Type\%40BarsTypes.cs" />
     <Compile Include="Type\%40ChartStyles.cs" />
     <Compile Include="Type\%40DefaultFillType.cs" />

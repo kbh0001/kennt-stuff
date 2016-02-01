@@ -4,6 +4,7 @@ namespace NinjaTrader.Custom.Strategy
 {
     public class MoveGenericActiveOrder
     {
+        public MoveExitStrategyBase ExitStrategy { get; set; }
         public double StrikeWidth { get; set; }
         public Guid Id { get; set; }
         public DateTime Time { get; set; }
@@ -12,6 +13,6 @@ namespace NinjaTrader.Custom.Strategy
         public bool IsLong { get; set; }
         public double EnteredAt { get; set; }
         public double ExitAt { get; set; }
-        public double SettleAT { get; set; }
+        public double SuccessFullySettlesAt { get; set; }
     }
 }
