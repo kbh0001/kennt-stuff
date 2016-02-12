@@ -39,7 +39,7 @@ namespace NinjaTrader.Custom.Strategy
         protected override void Initialize()
         {
             var instrument = Instrument.ToString().ToUpper().Replace("DEFAULT", "").Replace(" ", "");
-            _strikeWidth = MoveBinaryStrikeWidthProvider.GetBinaryStrikeWidthFor(instrument);
+            _strikeWidth = NadexTwoHourBinaryStrikeWidthProvider.GetBinaryStrikeWidthFor(instrument);
             _activeOrderTracker = new MoveActiveOrderTracker();
             _activeOrderTracker.PrintFunction = Print;
             Print(string.Format("Starting for KenCandleStickStrategy {0}", Instrument));
@@ -83,7 +83,7 @@ namespace NinjaTrader.Custom.Strategy
                 var volScore = GetVoltilityScore();
 
 
-                if (isBull && volScore == Volatility.High && (new int[] { 0, 10, 20 }).Contains(now.Minute))
+                if (isBull && volScore == Volatility.High && (new int[] { 10, 20, 30 }).Contains(now.Minute) && IsBullOtmReady())
                 {
              
                     var expiryTime = now.AddHours(1);
@@ -101,7 +101,7 @@ namespace NinjaTrader.Custom.Strategy
 
                     order.IsLong = true;
                     order.SuccessFullySettlesAt = Close[0] + (Math.Abs(_strikeWidth*.25));
-                    order.ExitStrategy = new BullishOtmExitStrategy(Close[0] + (Math.Abs(_strikeWidth)));
+                    order.ExitStrategy = new BullishOtmExitStrategy(Close[0] + (Math.Abs(_strikeWidth)*2));
                     SendNotification(order);
 
 
@@ -109,7 +109,7 @@ namespace NinjaTrader.Custom.Strategy
                 }
 
 
-                else if (isBear && volScore == Volatility.High && (new int[] { 0, 10, 20 }).Contains(now.Minute))
+                else if (false && isBear && volScore == Volatility.High && (new int[] { 0, 10 }).Contains(now.Minute))
                 {
                     var expiryTime = now.AddHours(1);
 
@@ -127,13 +127,13 @@ namespace NinjaTrader.Custom.Strategy
 
                     order.IsLong = false;
                     order.SuccessFullySettlesAt = Close[0] - (Math.Abs(_strikeWidth*.25));
-                    order.ExitStrategy = new BearishOtmExitStrategy(Close[0] - (Math.Abs(_strikeWidth)));
+                    order.ExitStrategy = new BearishOtmExitStrategy(Close[0] - (Math.Abs(_strikeWidth)*2));
                     SendNotification(order);
                     _activeOrderTracker.AddOrder(order);
                 }
 
                 
-                else if  (isBull && volScore == Volatility.Low && (new int[]{40,50}).Contains(now.Minute))
+                else if  (false && isBull && volScore == Volatility.Low && (new int[]{40,50}).Contains(now.Minute))
                 {
                     var expiryTime = now;
 
@@ -156,7 +156,7 @@ namespace NinjaTrader.Custom.Strategy
 
                     _activeOrderTracker.AddOrder(order);
                 }
-                else if (isBear && volScore == Volatility.Low && (new int[] { 50 }).Contains(now.Minute))
+                else if (false && isBear && volScore == Volatility.Low && (new int[] { 50 }).Contains(now.Minute))
                 {
                     var expiryTime = now;
 
@@ -192,7 +192,7 @@ namespace NinjaTrader.Custom.Strategy
 
 
         {
-            return IsBearCrossOver(0) && Slope(StochasticsFunc().K, 1, 0) < 0;
+            return IsBearCrossOver(0) && Slope(StochasticsFunc().K, 1, 0) < 0 && (Close[0] < Open[0]);
         }
 
         private bool IsBearCrossOver(int barsAgo)
@@ -203,7 +203,26 @@ namespace NinjaTrader.Custom.Strategy
 
         private bool IsBull()
         {
-            return IsBullCrossOver(0) && Slope(StochasticsFunc().K, 1, 0) > 0;
+            return IsBullCrossOver(0) && Slope(StochasticsFunc().K, 1, 0) > 0 && (Close[0] > Open[0]) ;
+        }
+
+        private bool IsBullOtmReady()
+        {
+            return true;
+            var map = new Dictionary<int, int>() {{10, 0}, {20, 1}, {30, 2}};
+            var now = DateTime.Parse(Time.ToString()).Minute;
+
+            if (map.ContainsKey(now))
+            {
+                return Close[0] <= (Open[map[now]] - _strikeWidth);
+            }
+
+
+            
+
+            return false;
+
+
         }
 
         private bool IsBullCrossOver(int barsAgo)
@@ -247,12 +266,12 @@ namespace NinjaTrader.Custom.Strategy
                 (order.IsLong) ? "BULL" : "BEAR",
                 Close[0]);
             var mailContentTemplate = @"A {0} signal was observed in '{1}' at {2} at a closing price of {3}.
-Exit at {4}
+{4}
 Strike Width: {5}
 Strategy: {6}
 ";
             var mailContent = string.Format(mailContentTemplate, (order.IsLong) ? "BULL" : "BEAR", Instrument, Time,
-                Close[0], order.ExitAt, order.StrikeWidth, order.ExitStrategy.GetType().Name);
+                Close[0], order.ExitStrategy.ExitStategyDescr, order.StrikeWidth, order.ExitStrategy.GetType().Name);
 
             if (Historical)
                 return;

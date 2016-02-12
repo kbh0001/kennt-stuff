@@ -15,6 +15,7 @@ namespace NinjaTrader.Custom.Strategy
         private int _winningBears;
         private int _winningBulls;
         private Action<string> _printFunction;
+        
 
 
        

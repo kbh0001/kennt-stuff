@@ -13,6 +13,11 @@ namespace NinjaTrader.Custom.Strategy
         }
 
 
+        public override string ExitStategyDescr
+        {
+            get { return "Hold untill settlement"; }
+        }
+
         public override bool ExitSuccessfull(MoveGenericActiveOrder order, DateTime now, double open, double close, double high, double low)
         {
             return false;

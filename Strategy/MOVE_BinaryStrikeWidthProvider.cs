@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace NinjaTrader.Custom.Strategy
 {
-    public class MoveBinaryStrikeWidthProvider
+    public class NadexTwoHourBinaryStrikeWidthProvider
     {
         private static readonly SortedList<string, double> _binaryWidths = new SortedList<string, double>()
         {
@@ -29,4 +29,7 @@ namespace NinjaTrader.Custom.Strategy
         }
         
     }
-}
+
+
+ 
+ }

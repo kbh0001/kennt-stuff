@@ -13,6 +13,12 @@ namespace NinjaTrader.Custom.Strategy
         }
 
 
+        public override string ExitStategyDescr
+        {
+
+            get { return "Exit at: " + _exitAt.ToString(); }
+        }
+
         public override bool ExitSuccessfull(MoveGenericActiveOrder order, DateTime now, double open, double close, double high, double low)
         {
             if (low <= _exitAt)
