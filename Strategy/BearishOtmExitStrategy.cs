@@ -5,13 +5,15 @@ namespace NinjaTrader.Custom.Strategy
     public class BearishOtmExitStrategy : MoveExitStrategyBase
     {
 
-        private double _exitAt;
 
-        public BearishOtmExitStrategy(double exitAmount)
+        private readonly double _exitAt;
+        private readonly double _settlesAt;
+
+        public BearishOtmExitStrategy(double exitAmount, double settleAmount)
         {
             _exitAt = exitAmount;
+            _settlesAt = settleAmount;
         }
-
 
         public override string ExitStategyDescr
         {
@@ -32,6 +34,32 @@ namespace NinjaTrader.Custom.Strategy
         {
             //always go to settlement if we have not exited.
             return false;
+        }
+
+
+        public override bool SettlesSuccessFull(MoveGenericActiveOrder order, double close)
+        {
+            return close < _settlesAt;
+        }
+
+        public override double CashOnSuccesfulExit
+        {
+            get { return 19; }
+        }
+
+        public override double CashOnSuccessfulSettle
+        {
+            get { return 64; }
+        }
+
+        public override double CashOnFailedSettle
+        {
+            get { return -35; }
+        }
+
+        public override double CashOnFailedExit
+        {
+            get { throw new NotImplementedException(); }
         }
     }
 }

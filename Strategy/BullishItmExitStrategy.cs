@@ -33,5 +33,30 @@ namespace NinjaTrader.Custom.Strategy
             return false;
             
         }
+
+        public override bool SettlesSuccessFull(MoveGenericActiveOrder order, double close)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override double CashOnSuccesfulExit
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override double CashOnSuccessfulSettle
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override double CashOnFailedSettle
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override double CashOnFailedExit
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 }
